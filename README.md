@@ -89,3 +89,17 @@ artifacts/
   ├─ charts/      # Visualization images (plots, graphs)
   └─ summaries/   # Statistical summaries, CSV/Excel exports
 ```
+
+## License
+
+This project is licensed under the **MIT License**.
+
+You are free to use, copy, modify, merge, publish, distribute, sublicense,  
+and/or sell copies of this software, provided that proper credit is given  
+to the original author.
+
+Unauthorized use without attribution, including academic misuse  
+(e.g., using this work in reports, papers, or publications without citation)  
+is strictly prohibited.
+
+For full details, see the LICENSE file.
