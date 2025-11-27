@@ -1,62 +1,25 @@
-# Project Name?
-주제 고민중
-
-## Language
 [EN](../README.md) | [KO](README.ko.md)
 
----
+# 백엔드 - Python 데이터 분석 파이프라인
+이 백엔드 모듈은 CSV 데이터를 로딩하고 전처리한 뒤, 
+통계 지표를 계산하여 구조화된 JSON 아티팩트로 생성하는 역할을 수행합니다.  
 
-## 프로젝트 개요 (Project Overview)
-이 프로젝트는 Python 기반 데이터 분석을 수행하기 위한 구조화된 분석 시스템입니다. CSV 또는 Excel 데이터를 불러오고, 필요에 따라 전처리/분석/시각화를 수행하며 최종 결과물(차트, 통계 요약 등)을 artifacts 디렉토리에 저장합니다.
+생성된 JSON 파일은 프론트엔드(Next.js)에서 대시보드를 렌더링하는 데 사용됩니다.
 
-## 프로젝트 구조 (Project Structure)
+전체 코드는 계층형 아키텍처(app → domain → infrastructure → presentation)를 기반으로 작성되어 유지보수성과 확장성을 고려했습니다.
+
+## 백엔드 구조 요약
 ```text
-final-project-data-analysis/
-│
-├─ README.md                        # 메인 영어 문서
-├─ requirements.txt                 # Python 종속성 목록
-├─ .gitignore
-│
-├─ data/                            # 입력 데이터 (CSV, Excel 등)
-│   └─ ...logs.csv
-│
-├─ artifacts/                       # 생성된 분석 산출물 (차트, summary 등)
-│   ├─ charts/
+backend/
+├─ data/                 # 입력 CSV 파일
+├─ artifacts/            # 생성된 JSON/차트 등 결과물
 │   └─ summaries/
-│
-├─ docs/                            # 프로젝트 문서 (한국어 포함)
-│   ├─ README.ko.md                 # 한국어 README
-│   ├─ requirements-analysis.md     # 요구사항 분석 문서
-│   ├─ io-design.md                 # 입출력(화면) 설계
-│   └─ system-architecture.md       # 계층 구조 및 시스템 설계
-│
-├─ video/                           # 시연 영상
-│   └─ demo.mp4
-│
-└─ src/                             # 소스 코드 (계층 기반 구조)
-    ├─ app/                         # 애플리케이션 계층 (엔트리 포인트, 파이프라인)
-    │   ├─ main.py
-    │   └─ config.py
-    │
-    ├─ domain/                      # 도메인 계층 (엔티티, 비즈니스 로직)
-    │   ├─ entities/
-    │   │   └─ ...log.py
-    │   └─ services/
-    │       └─ metrics.py
-    │
-    ├─ infrastructure/              # 인프라 계층 (I/O, 저장, 로깅 등)
-    │   ├─ io/
-    │   │   ├─ csv_loader.py
-    │   │   └─ artifact_writer.py
-    │   └─ logging/
-    │       └─ logger.py
-    │
-    └─ presentation/                # 프레젠테이션 계층 (시각화, 보고서 생성)
-        ├─ charts/
-        │   ├─ stage_chart.py
-        │   └─ daily_chart.py
-        └─ reports/
-            └─ console_report.py
+│       └─ summary.json
+└─ src/
+    ├─ app/              # 실행 엔트리포인트
+    ├─ domain/           # 분석 로직
+    ├─ infrastructure/   # 파일 입출력
+    └─ presentation/     # (선택적) 출력/시각화
 ```
 
 ## 종속성 (Dependencies)
@@ -85,19 +48,3 @@ artifacts/
   ├─ charts/      # 시각화 이미지
   └─ summaries/   # 통계 요약, 엑셀 파일 등
 ```
-
-## 라이선스 (KO)
-
-이 프로젝트는 **MIT 라이선스**로 배포됩니다.
-
-다음과 같은 행위가 허용됩니다.
-- 소프트웨어의 사용, 복사, 수정, 병합
-- 배포, 재배포
-- 상업적 이용
-
-단, **원저작자 표기(저작권 표시)**는 필수입니다.  
-출처를 밝히지 않은 무단 사용, 특히 학술적 사용 
-(이 프로젝트 내용을 논문/과제/발표에 무단 포함 등)은  
-명백한 저작권 침해이며 법적 책임이 발생할 수 있습니다.
-
-자세한 내용은 `LICENSE` 파일을 참고하십시오.
