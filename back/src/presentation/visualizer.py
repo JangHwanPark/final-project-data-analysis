@@ -34,16 +34,25 @@ class Visualizer:
     :param summary: DatasetSummary 객체.
     """
     logger.info("Starting chart generation.")
-    metrics = summary.metrics
+    # metrics = summary.metrics
+    # --- 방어적 로직: summary가 딕셔너리일 경우 처리 (ACL) ---
+    if isinstance(summary, dict):
+        # 딕셔너리일 경우, 'metrics' 키로 접근합니다.
+        metrics = summary.get('metrics', {})
+        logger.warning("WARN: Visualizer received a 'dict' instead of a 'DatasetSummary' DTO.")
+    else:
+        # DatasetSummary 객체인 경우, 속성으로 접근합니다.
+        metrics = summary.metrics
+    # --------------------------------------------------------
 
-    # 1. 난이도별 분포 (파이 차트)
+    # 난이도별 분포 (파이 차트)
     self._plot_pie_distribution(
       data=metrics['difficulty_distribution'],
       title='Distribution by Difficulty Level',
       filename='difficulty_pie_chart.png'
     )
 
-    # 2. 상위 태그 분포 (막대 그래프)
+    # 상위 태그 분포 (막대 그래프)
     self._plot_bar_chart(
       data=metrics['top_tags_distribution'],
       title='Top 10 Problem Tags',
@@ -52,7 +61,7 @@ class Visualizer:
       y_label='Count'
     )
 
-    # 3. 알고리즘 카테고리 분포 (막대 그래프)
+    # 알고리즘 카테고리 분포 (막대 그래프)
     self._plot_bar_distribution(
       data=metrics['algorithm_category_distribution'],
       title='Algorithm Category Distribution',
@@ -96,7 +105,7 @@ class Visualizer:
     counts = list(data.values())
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x=categories, y=counts, ax=ax, palette="viridis")
+    sns.barplot(x=categories, y=counts, ax=ax, palette="viridis", hue=categories, legend=False)
 
     ax.set_title(title, fontsize=14, fontweight='bold')
     ax.set_xlabel(x_label, fontsize=12)

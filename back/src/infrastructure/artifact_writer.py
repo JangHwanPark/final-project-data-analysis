@@ -35,22 +35,24 @@ class ArtifactWriter:
 
     # JSON 직렬화 가능한 딕셔너리로 변환
     if isinstance(summary, dict):
-      data_to_write = dict(summary)
+      data_to_write = summary
     else:
       data_to_write = summary.to_dict()
 
-    timestamp = datetime.utcnow().isoformat()
-    if "timestamp" in data_to_write:
-      data_to_write["timestamp"] = timestamp
-    else:
-      data_to_write["generated_at"] = timestamp
-
     try:
+      if filepath.is_dir():
+        logger.error(f"ERROR: Filepath {filepath} is a directory, not a file.")
+        return None
+
       with open(filepath, 'w', encoding='utf-8') as f:
         # 가독성을 위해 indent=4로 설정
         json.dump(data_to_write, f, ensure_ascii=False, indent=4)
       logger.info(f"SUCCESS: Analysis JSON written to {filepath}")
       return filepath
+
+    except UnicodeEncodeError as e:
+      logger.exception(f"ERROR: Could not encode JSON file to UTF-8: {filepath}")
+      return None
     except IOError as e:
       logger.exception(f"ERROR: Could not write JSON file to {filepath}.")
       return None
