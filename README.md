@@ -1,4 +1,4 @@
-[KO](/docs/README.ko.md) | [EN](/README.md)
+[KO](./docs/README.ko.md) | [EN](/README.md)
 
 # Data Analysis Project
 This project performs CSV-based data analysis using Python and visualizes the results through a dashboard built with Next.js (React).

@@ -1,3 +1,5 @@
+[KO](README.ko.md) | [EN](../README.md)
+
 # 데이터 분석 프로젝트
 Python으로 CSV 데이터를 분석하고, Next.js(React)로 분석 결과를 대시보드 형태로 시각화하는 프로젝트입니다.
 
