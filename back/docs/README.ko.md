@@ -1,25 +1,22 @@
 [EN](../README.md) | [KO](README.ko.md)
 
 # 백엔드 - Python 데이터 분석 파이프라인
-이 백엔드 모듈은 CSV 데이터를 로딩하고 전처리한 뒤, 
-통계 지표를 계산하여 구조화된 JSON 아티팩트로 생성하는 역할을 수행합니다.  
+이 백엔드는 CSV 데이터를 로딩하고 전처리한 뒤 통계 지표를 계산하여 JSON 아티팩트를 생성합니다.
 
-생성된 JSON 파일은 프론트엔드(Next.js)에서 대시보드를 렌더링하는 데 사용됩니다.
-
-전체 코드는 계층형 아키텍처(app → domain → infrastructure → presentation)를 기반으로 작성되어 유지보수성과 확장성을 고려했습니다.
+생성된 JSON은 프론트엔드(Next.js) 대시보드를 렌더링하는 데 사용되며, 코드 전체가 하나의 파이썬 패키지(`backend`) 아래 계층형 아키텍처(app → domain → infrastructure → presentation)로 정리되어 있습니다.
 
 ## 백엔드 구조 요약
 ```text
 backend/
-├─ data/                 # 입력 CSV 파일
-├─ artifacts/            # 생성된 JSON/차트 등 결과물
+├─ data/                     # 입력 CSV 파일
+├─ artifacts/                # 생성된 JSON/차트 등 결과물
 │   └─ summaries/
 │       └─ summary.json
-└─ src/
-    ├─ app/              # 실행 엔트리포인트
-    ├─ domain/           # 분석 로직
-    ├─ infrastructure/   # 파일 입출력
-    └─ presentation/     # (선택적) 출력/시각화
+└─ src/                   # 패키지 루트
+   ├─ app/                # 실행 엔트리포인트
+   ├─ domain/             # 분석 로직 & 엔티티
+   ├─ infrastructure/     # 설정, 로깅, 파일 I/O
+   └─ presentation/       # (선택적) 출력/시각화
 ```
 
 ## 종속성 (Dependencies)
@@ -73,9 +70,14 @@ python -m pip install -r requirements.txt
 ```
 
 ## 실행 방법 (How to Run)
+`src` 폴더를 `PYTHONPATH`에 추가한 뒤 `backend` 패키지를 모듈 형태로 실행합니다.
+
 ```bash
-python src/app/main.py
+cd back
+export PYTHONPATH="$(pwd)/src"  # PowerShell: $env:PYTHONPATH="$(Get-Location)/src"
+python -m backend.app.main --data-file data/coding-questions-dataset/questions_dataset.csv
 ```
+`--data-file` 옵션은 선택 사항이며, 기본값은 `backend.infrastructure.config.DATA_FILE` 상수를 따릅니다.
 
 ## 출력 (Artifacts)
 분석 결과는 아래 디렉토리에 저장됩니다.

@@ -6,7 +6,7 @@ from typing import Optional
 
 # Infrastructure Dependencies
 from infrastructure.logging import get_logger
-from infrastructure.config import SUMMARIES_DIR, CHARTS_DIR
+from infrastructure.config import SUMMARIES_DIR
 
 # Domain Dependencies
 from domain.entities.data_model import DatasetSummary
@@ -34,11 +34,16 @@ class ArtifactWriter:
       logger.warning(f"WARN: Writing to non-standard summaries directory: {filepath.parent}")
 
     # JSON 직렬화 가능한 딕셔너리로 변환
-    # data_to_write = summary.to_dict()
     if isinstance(summary, dict):
-      data_to_write = summary
+      data_to_write = dict(summary)
     else:
       data_to_write = summary.to_dict()
+
+    timestamp = datetime.utcnow().isoformat()
+    if "timestamp" in data_to_write:
+      data_to_write["timestamp"] = timestamp
+    else:
+      data_to_write["generated_at"] = timestamp
 
     try:
       with open(filepath, 'w', encoding='utf-8') as f:

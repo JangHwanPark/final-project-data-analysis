@@ -1,26 +1,22 @@
 [EN](README.md) |  [KO](docs/README.ko.md)
 
 # Backend – Python Data Analysis Pipeline
-This backend module is responsible for loading CSV data, preprocessing it,  
-computing statistical metrics, and generating structured JSON artifacts.  
-These JSON files are then consumed by the frontend (Next.js) to render the dashboard.
+This backend loads CSV data, performs preprocessing, computes statistical metrics, and emits JSON artifacts for the frontend dashboard. The codebase is organized as a proper Python package (`backend`) to simplify imports and execution.
 
-The backend follows a layered architecture  
-(app → domain → infrastructure → presentation)  
-to ensure maintainability and scalability.
+The layered architecture remains the same (app → domain → infrastructure → presentation) but is now grouped under a single package root.
 
 ## Backend Structure Overview
 ```text
 backend/
-├─ data/                 # Input CSV file(s)
-├─ artifacts/            # Generated JSON files and optional charts
+├─ data/                     # Input CSV file(s)
+├─ artifacts/                # Generated JSON files and optional charts
 │   └─ summaries/
 │       └─ summary.json
-└─ src/
-    ├─ app/              # Entry point
-    ├─ domain/           # Analysis logic
-    ├─ infrastructure/   # File I/O utilities
-    └─ presentation/     # (Optional) visualization / reporting
+└─ src/                   # Package root
+   ├─ app/                # CLI entry point
+   ├─ domain/             # Analysis logic & entities
+   ├─ infrastructure/     # File I/O, logging, configuration
+   └─ presentation/       # (Optional) visualization / reporting
 ```
 
 ## Dependencies
@@ -76,10 +72,13 @@ Use the full path inside the virtual environment
 ```
 
 ## How to Run
-To execute the main analysis pipeline, run the following command.
+Run the pipeline from the `back` directory with the `src` folder on your `PYTHONPATH`.
 ```bash
-python src/app/main.py
+cd back
+export PYTHONPATH="$(pwd)/src"  # PowerShell: $env:PYTHONPATH="$(Get-Location)/src"
+python -m backend.app.main --data-file data/coding-questions-dataset/questions_dataset.csv
 ```
+The `--data-file` flag is optional; by default the loader reads the CSV defined in `backend.infrastructure.config.DATA_FILE`.
 
 ## Artifacts
 All analysis results are stored in the following directory.

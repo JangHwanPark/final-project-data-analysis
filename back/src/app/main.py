@@ -6,26 +6,8 @@ import sys
 import os
 
 # =================================================================
-# 중요: 실행 안내
-# 이 파일을 실행하려면 반드시 패키지 루트(backend/)에서
-# 'python -m src.app.main' 명령어를 사용해야 합니다.
-# (스크립트로 직접 실행 시 ModuleNotFoundError 발생)
+# CLI entry point for the backend data analysis pipeline.
 # =================================================================
-
-# =================================================================
-# 중요: 실행 경로 설정 (스크립트 직접 실행을 위한 방어 로직)
-# 'python src/app/main.py' 형태로 실행 시 'src' 패키지를 인식하게 합니다.
-# =================================================================
-try:
-    # 현재 파일의 부모 디렉토리(src/app)에서 두 단계 위 (backend/)를 프로젝트 루트로 설정
-    PROJECT_ROOT_DIR = Path(__file__).resolve().parents[2]
-    if str(PROJECT_ROOT_DIR) not in sys.path:
-        sys.path.append(str(PROJECT_ROOT_DIR))
-except Exception:
-    # 예외 발생 시 로깅 대신 단순 경고 처리
-    pass
-# =================================================================
-
 # --- Infrastructure Layer 임포트 ---
 from infrastructure.config import ensure_directories, DATA_FILE, SUMMARIES_DIR
 from infrastructure.data_loader import DataLoader
@@ -36,7 +18,7 @@ from infrastructure.logging import get_logger, StepLogger
 from domain.service.metrics import compute_statistics
 from domain.entities.data_model import QuestionData, DatasetSummary
 
-logger = get_logger("__name__")
+logger = get_logger(__name__)
 
 
 def parse_arguments() -> Path:

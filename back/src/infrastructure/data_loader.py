@@ -18,7 +18,6 @@ class DataLoader:
   # CSV 파일을 읽어 pandas DataFrame을 QuestionData 도메인 객체로 반환합니다.
 
   def __init__(self):
-    """DataLoader 초기화."""
     logger.info("DataLoader initialized.")
 
   def load_csv_data(self, filepath: Path) -> Optional[QuestionData]:
@@ -43,9 +42,19 @@ class DataLoader:
       )
 
       # 최소 필수 컬럼 검증 (프로젝트 데이터에 맞게 수정)
-      required_cols = ['Difficulty', 'Title', 'Description']
-      if not all(col in df.columns for col in required_cols):
-        logger.warning(f"WARN: Missing expected columns in CSV. Expected: {required_cols}")
+      required_cols = ['title', 'description', 'difficulty_level']
+      missing_cols = []
+      logger.info("Starting required column validation:")
+      for col in required_cols:
+        if col in df.columns:
+          logger.info(f" -> FOUND column: '{col}'")
+        else:
+          logger.warning(f" -> MISSING column: '{col}'")
+          missing_cols.append(col)
+
+      # 최종 경고 메시지 출력 (누락된 컬럼이 있을 경우)
+      if missing_cols:
+        logger.warning(f"WARN: Missing required columns in CSV: {missing_cols}")
 
       logger.info(f"SUCCESS: Data loaded. Total records: {len(df)}")
       return QuestionData(df=df, source_name=filepath.name)
