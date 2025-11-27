@@ -57,6 +57,12 @@ pip install -r requirements.txt
 OR
 
 ```bash
+py -3 -m pip install -r requirements.txt
+```
+
+OR
+
+```bash
 python -m pip install -r requirements.txt
 ```
 
