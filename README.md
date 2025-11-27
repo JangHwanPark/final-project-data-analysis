@@ -8,6 +8,15 @@ These artifacts are saved in the `artifacts/` directory for direct use by the fr
 
 The frontend loads the generated JSON files and renders a visual dashboard consisting of charts and tables.
 
+## Dataset Source
+This project uses the following dataset sourced from Kaggle:
+
+**Coding Questions Dataset**  
+https://www.kaggle.com/datasets/guitaristboy/coding-questions-dataset
+
+The dataset contains 600+ programming questions with metadata such as
+title, description, difficulty, examples, constraints, and test cases.
+
 ## Repositories
 [frontend](/front) | [backend](/back)
 

@@ -7,6 +7,15 @@ Python으로 CSV 데이터를 분석하고, Next.js(React)로 분석 결과를 �
 
 프론트엔드는 이 JSON 데이터를 불러와 차트·테이블 형태로 시각화된 대시보드를 제공합니다.
 
+## 데이터셋 출처
+이 프로젝트에서 사용하는 데이터셋은 아래 Kaggle 자료를 기반으로 합니다.
+
+**Coding Questions Dataset**  
+https://www.kaggle.com/datasets/guitaristboy/coding-questions-dataset
+
+총 600개 이상의 프로그래밍 문제가 포함되어 있으며  
+제목, 설명, 난이도, 예제, 제약 조건, 테스트 케이스 등으로 구성된 구조화된 데이터셋입니다.
+
 ## 리포지토리 바로가기
 [front](/front) | [backend](/back)
 
