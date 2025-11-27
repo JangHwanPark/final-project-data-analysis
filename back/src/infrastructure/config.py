@@ -24,9 +24,10 @@ OUTPUT_BACK_DIR: Final[Path] = SUMMARIES_DIR / "summary.json"
 
 # 프론트 경로에 산출물 저장
 FRONTEND_DIR: Final[Path] = ROOT_DIR.parent / "front"
-FRONTEND_PUBLIC_DIR: Final[Path] = FRONTEND_DIR / "public"
+FRONTEND_PUBLIC_DIR: Final[Path] = FRONTEND_DIR / "public" / "data"
 FRONTEND_SHARED_DIR: Final[Path] = FRONTEND_DIR / "src" / "shared" / "data"
-FRONTEND_SUMMARY_FILE: Final[Path] = FRONTEND_DIR / "summary.json"
+FRONTEND_PUBLIC_SUMMARY_DIR: Final[Path] = FRONTEND_PUBLIC_DIR / "summary.json"
+FRONTEND_SHARED_SUMMARY_DIR: Final[Path] = FRONTEND_SHARED_DIR / "summary.json"
 
 
 # artifacts 디렉토리를 자동으로 생성하는 유틸

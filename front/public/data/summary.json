@@ -1,0 +1,255 @@
+{
+    "overview": {
+        "total_questions": 616,
+        "distinct_difficulties": 3,
+        "earliest_created_at": "2025-03-16T09:50:40.463489+00:00",
+        "latest_created_at": "2025-03-18T12:43:45.737301+00:00",
+        "days_span": 2
+    },
+    "metrics": {
+        "difficulty_distribution": {
+            "counts": {
+                "Hard": 240,
+                "Medium": 193,
+                "Easy": 183
+            },
+            "percentages": {
+                "Hard": 38.96,
+                "Medium": 31.33,
+                "Easy": 29.71
+            }
+        },
+        "avg_description_length_by_difficulty": {
+            "Easy": 204.21,
+            "Hard": 346.12,
+            "Medium": 268.61
+        },
+        "avg_test_cases_by_difficulty": {
+            "Easy": 5.17,
+            "Hard": 5.41,
+            "Medium": 5.35
+        },
+        "algorithm_category_distribution": {
+            "counts": {
+                "Uncategorized": 301,
+                "Tree": 120,
+                "String": 97,
+                "Graph": 56,
+                "Binary Search": 10,
+                "Math": 8,
+                "Interval": 6,
+                "Queue": 5,
+                "Sliding Window": 5,
+                "Greedy": 3,
+                "DP": 3,
+                "Stack": 1,
+                "Heap": 1
+            },
+            "percentages": {
+                "Uncategorized": 48.86,
+                "Tree": 19.48,
+                "String": 15.75,
+                "Graph": 9.09,
+                "Binary Search": 1.62,
+                "Math": 1.3,
+                "Interval": 0.97,
+                "Queue": 0.81,
+                "Sliding Window": 0.81,
+                "Greedy": 0.49,
+                "DP": 0.49,
+                "Stack": 0.16,
+                "Heap": 0.16
+            }
+        },
+        "input_type_distribution": {
+            "counts": {
+                "Array": 377,
+                "String": 78,
+                "Mixed/Other": 67,
+                "Tree": 57,
+                "Matrix": 32,
+                "Graph": 5
+            },
+            "percentages": {
+                "Array": 61.2,
+                "String": 12.66,
+                "Mixed/Other": 10.88,
+                "Tree": 9.25,
+                "Matrix": 5.19,
+                "Graph": 0.81
+            }
+        },
+        "top_tags_distribution": {
+            "array": 377,
+            "tree": 120,
+            "string": 98,
+            "graph": 71,
+            "uncategorized": 50,
+            "matrix": 35,
+            "binary_search": 27,
+            "math": 17,
+            "queue": 8,
+            "interval": 6
+        },
+        "example_count_distribution": {
+            "0": 0,
+            "1": 0,
+            "2": 608,
+            "3+": 8
+        },
+        "test_case_count_distribution": {
+            "0-1": 0,
+            "2-3": 0,
+            "4-6": 556,
+            "7+": 60
+        },
+        "example_testcase_by_difficulty": {
+            "Easy": {
+                "num_examples": 2.02,
+                "num_test_cases": 5.17
+            },
+            "Hard": {
+                "num_examples": 2.02,
+                "num_test_cases": 5.41
+            },
+            "Medium": {
+                "num_examples": 2.02,
+                "num_test_cases": 5.35
+            }
+        },
+        "description_length_bucket_distribution": {
+            "0-200": 218,
+            "201-400": 284,
+            "401-600": 91,
+            "601+": 23
+        },
+        "constraints_count_distribution": {
+            "0": 0,
+            "1": 0,
+            "2-3": 198,
+            "4+": 418
+        },
+        "problems_per_day": [
+            {
+                "date": "2025-03-16",
+                "count": 474
+            },
+            {
+                "date": "2025-03-18",
+                "count": 142
+            }
+        ],
+        "difficulty_over_time": [
+            {
+                "date": "2025-03-16",
+                "Easy": 135,
+                "Hard": 191,
+                "Medium": 148
+            },
+            {
+                "date": "2025-03-18",
+                "Easy": 48,
+                "Hard": 49,
+                "Medium": 45
+            }
+        ],
+        "output_type_distribution": {
+            "counts": {
+                "Integer": 616
+            },
+            "percentages": {
+                "Integer": 100.0
+            }
+        },
+        "negative_one_output_problems_ratio": {
+            "counts": {
+                "false": 533,
+                "true": 83
+            },
+            "percentages": {
+                "false": 86.53,
+                "true": 13.47
+            }
+        },
+        "difficulty_algorithm_matrix": {
+            "Easy": {
+                "Binary Search": 10,
+                "DP": 0,
+                "Graph": 22,
+                "Greedy": 2,
+                "Heap": 0,
+                "Interval": 3,
+                "Math": 2,
+                "Queue": 2,
+                "Sliding Window": 1,
+                "Stack": 0,
+                "String": 25,
+                "Tree": 41,
+                "Uncategorized": 75
+            },
+            "Hard": {
+                "Binary Search": 0,
+                "DP": 2,
+                "Graph": 14,
+                "Greedy": 1,
+                "Heap": 0,
+                "Interval": 3,
+                "Math": 6,
+                "Queue": 3,
+                "Sliding Window": 4,
+                "Stack": 1,
+                "String": 33,
+                "Tree": 45,
+                "Uncategorized": 128
+            },
+            "Medium": {
+                "Binary Search": 0,
+                "DP": 1,
+                "Graph": 20,
+                "Greedy": 0,
+                "Heap": 1,
+                "Interval": 0,
+                "Math": 0,
+                "Queue": 0,
+                "Sliding Window": 0,
+                "Stack": 0,
+                "String": 39,
+                "Tree": 34,
+                "Uncategorized": 98
+            }
+        },
+        "difficulty_input_type_matrix": {
+            "Easy": {
+                "Array": 127,
+                "Graph": 0,
+                "Matrix": 3,
+                "Mixed/Other": 17,
+                "String": 23,
+                "Tree": 13
+            },
+            "Hard": {
+                "Array": 136,
+                "Graph": 5,
+                "Matrix": 21,
+                "Mixed/Other": 24,
+                "String": 27,
+                "Tree": 27
+            },
+            "Medium": {
+                "Array": 114,
+                "Graph": 0,
+                "Matrix": 8,
+                "Mixed/Other": 26,
+                "String": 28,
+                "Tree": 17
+            }
+        },
+        "duplicate_title_count": 58,
+        "description_template_usage": {
+            "given_array": 157,
+            "given_binary_tree": 23,
+            "given_graph": 8,
+            "return_true_false": 1
+        }
+    }
+}

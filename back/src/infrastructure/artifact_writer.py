@@ -40,6 +40,8 @@ class ArtifactWriter:
       data_to_write = summary.to_dict()
 
     try:
+      filepath.parent.mkdir(parents=True, exist_ok=True)
+
       if filepath.is_dir():
         logger.error(f"ERROR: Filepath {filepath} is a directory, not a file.")
         return None

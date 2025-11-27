@@ -1,18 +1,11 @@
 import logging
 from typing import Optional
+from infrastructure.logging.color_formatter import ColorFormatter
 
 _DEFAULT_FORMAT = "[%(asctime)s] [%(levelname)s] %(name)s - %(message)s"
 _DEFAULT_LEVEL = logging.INFO
 
 
-# 예시 사용법
-# if __name__ == '__main__':
-#     # 'data_loader' 로거 인스턴스 가져오기
-#     data_logger = get_logger('data_loader')
-#     data_logger.info("CSV 파일 로딩 시작.")
-#     # 'analysis_service' 로거 인스턴스 가져오기
-#     analysis_logger = get_logger('analysis_service')
-#     analysis_logger.warning("결측치(Missing Values)가 감지되었으나 처리되었습니다.")
 def get_logger(name: Optional[str] = None) -> logging.Logger:
   """
   주어진 이름에 대해 설정된 로거 인스턴스를 반환합니다.
@@ -29,8 +22,9 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
     logger.setLevel(_DEFAULT_LEVEL)
     # 스트림 핸들러 생성(콘솔/터미널 출력 담당)
     handler = logging.StreamHandler()
-    # 포맷 설정
-    handler.setFormatter(logging.Formatter(_DEFAULT_FORMAT))
+
+    # [포맷 설정] 기본 로그는 ColorFormatter 사용
+    handler.setFormatter(ColorFormatter(_DEFAULT_FORMAT))
     # 로거내 핸들러 추가
     logger.addHandler(handler)
     # 로그 전파 방지(부모 로거로 전파되는 것 방지)
