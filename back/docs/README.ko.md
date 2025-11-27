@@ -32,8 +32,38 @@ backend/
 | **jupyter**    | latest | Notebook 기반 인터랙티브 분석 환경 |
 
 ## 설치 방법 (Installation)
+### backend 디렉토리로 이동
+```bash
+cd back
+```
+
+### 가상 환경 생성 (Virtual Environment)
+```bash
+py -3 -m venv .venv
+```
+
+### 가상 환경 활성화 (Windows PowerShell)
+```bash
+.\.venv\Scripts\activate
+```
+
+## 의존성 설치 (Install Dependencies)
+가상 환경이 활성화된 상태에서 다음 명령 중 하나를 실행합니다.
+
 ```bash
 pip install -r requirements.txt
+```
+
+OR
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### Python 명령어가 인식되지 않는 경우
+전체 경로를 사용하세요.
+```bash
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 ## 실행 방법 (How to Run)

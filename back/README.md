@@ -35,9 +35,38 @@ This project uses the following Python dependencies
 | **jupyter**   | latest  | Notebook environment for interactive analysis |
 
 ## Installation
-You can install all dependencies using
+### Move into backend directory
+```bash
+cd back
+```
+
+### Create virtual environment
+```bash
+py -3 -m venv .venv
+```
+
+### Activate virtual environment (Windows PowerShell)
+```bash
+.\.venv\Scripts\activate
+```
+
+## Install all dependencies
+With the virtual environment activated, run one of the following commands.
+
 ```bash
 pip install -r requirements.txt
+```
+
+OR
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### If Python is not recognized
+Use the full path inside the virtual environment
+```bash
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 ## How to Run
