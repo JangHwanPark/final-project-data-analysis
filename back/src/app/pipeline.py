@@ -13,71 +13,123 @@ from domain.entities.data_model import QuestionData, DatasetSummary
 from presentation.visualizer import Visualizer
 from presentation.reports.excel_reporter import ExcelReporter
 from .options import PipelineOptions
+from constants.messages import (
+  PIPELINE_VERSION,
+  PIPELINE_TITLE_START,
+  PIPELINE_TITLE_COMPLETE,
+  PIPELINE_TITLE_FINISHED,
+  PIPELINE_MESSAGE_FATAL_EMPTY_DATA,
+  PIPELINE_STEP_ENSURE_DIRS,
+  PIPELINE_STEP_LOADING_DATA,
+  PIPELINE_STEP_COMPUTE_STATS,
+  PIPELINE_STEP_GENERATE_CHARTS,
+  PIPELINE_STEP_SAVE_ARTIFACTS,
+  PIPELINE_STEP_WRITE_JSON,
+  PIPELINE_LOG_SAVED,
+)
 
 
 class DataAnalysisPipeline:
-  def __init__(self, logger):
+  # 애플리케이션 계층의 데이터 분석 파이프라인 유즈케이스.
+  # 인프라/프리젠테이션 레이어의 구현(DataLoader, Visualizer, ArtifactWriter, ExcelReporter)을
+  #  주입 받아 orchestration만 담당한다.
+
+  def __init__(
+          self,
+          logger,
+          data_loader: DataLoader,
+          visualizer: Visualizer,
+          artifact_writer: ArtifactWriter,
+          reporter: ExcelReporter,
+  ) -> None:
     self.logger = logger
+    self.data_loader = data_loader
+    self.visualizer = visualizer
+    self.artifact_writer = artifact_writer
+    self.reporter = reporter
 
   def run(self, options: PipelineOptions) -> None:
     steps = StepLogger(logger_name=self.logger.name)
+    self._log_start_banner()
 
+    self._prepare_infrastructure(steps)
+    question_data = self._load_data(steps, options)
+
+    if question_data is None or question_data.df.empty:
+      self.logger.error(PIPELINE_MESSAGE_FATAL_EMPTY_DATA)
+      return
+
+    summary = self._compute_summary(steps, question_data)
+
+    if options.generate_charts:
+      self._generate_charts(steps, summary)
+
+    excel_path = self._write_artifacts(steps, summary)
+
+    self._log_completion(excel_path)
+
+  # ====================================================
+  # private helper methods
+  # ====================================================
+
+  def _log_start_banner(self) -> None:
     log_banner(
-      "PYTHON DATA ANALYSIS PIPELINE STARTED (Ver 3.0)",
+      PIPELINE_TITLE_START.format(version=PIPELINE_VERSION),
       color=FG.CYAN,
       line_color=FG.BLUE,
     )
 
-    # [인프라 준비] 디렉토리 준비
-    steps.step("Ensuring artifact directories...")
+  def _prepare_infrastructure(self, steps: StepLogger) -> None:
+    steps.step(PIPELINE_STEP_ENSURE_DIRS)
     ensure_directories()
 
-    # [데이터 로드] Infrastructure Layer
-    steps.step(f"Loading data from: {options.data_file}")
-    data_loader = DataLoader()
-    question_data: QuestionData = data_loader.load_csv_data(options.data_file)
+  def _load_data(self, steps: StepLogger, options: PipelineOptions) -> QuestionData:
+    steps.step(PIPELINE_STEP_LOADING_DATA.format(path=options.data_file))
+    return self.data_loader.load_csv_data(options.data_file)
 
-    if question_data is None or question_data.df.empty:
-      self.logger.error("FATAL: Data loading failed or resulted in empty DataFrame. Exiting pipeline.")
-      return
+  def _compute_summary(self, steps: StepLogger, question_data: QuestionData) -> DatasetSummary:
+    steps.step(PIPELINE_STEP_COMPUTE_STATS)
+    return compute_statistics(question_data.df)
 
-    # [Compute statistics] 통계 계산
-    steps.step("Computing domain metrics and statistics...")
-    summary: DatasetSummary = compute_statistics(question_data.df)
+  def _generate_charts(self, steps: StepLogger, summary: DatasetSummary) -> None:
+    steps.step(PIPELINE_STEP_GENERATE_CHARTS)
+    self.visualizer.create_and_save_charts(summary)
 
-    # [Presentation Layer] 시각화(차트)
-    if options.generate_charts:
-      steps.step("Generating charts and visualizations...")
-      visualizer = Visualizer()
-      visualizer.create_and_save_charts(summary)
-
-    # JSON + Excel
-    artifact_writer = ArtifactWriter()
-    reporter = ExcelReporter()
-    steps.step("Saving final artifacts across environments...")
+  def _write_artifacts(self, steps: StepLogger, summary: DatasetSummary) -> str:
+    # JSON(3곳) + Excel 저장을 처리하고, Excel 경로를 반환한다.
+    steps.step(PIPELINE_STEP_SAVE_ARTIFACTS)
 
     # JSON
-    steps.step(f"Writing primary JSON artifact to {OUTPUT_BACK_DIR.name}.....")
-    # [JSON 저장] 백엔드 아티팩트용 - 기록
-    artifact_writer.write_analysis_json(summary, OUTPUT_BACK_DIR)
-    # [JSON 저장] 프론트엔드 Public 디렉토리용
-    artifact_writer.write_analysis_json(summary, FRONTEND_PUBLIC_SUMMARY_DIR)
-    # [JSON 저장] 프론트엔드 Shared Data 디렉토리용
-    artifact_writer.write_analysis_json(summary, FRONTEND_SHARED_SUMMARY_DIR)
+    steps.step(PIPELINE_STEP_WRITE_JSON.format(target=OUTPUT_BACK_DIR.name))
+    self.artifact_writer.write_analysis_json(summary, OUTPUT_BACK_DIR)
+    self.artifact_writer.write_analysis_json(summary, FRONTEND_PUBLIC_SUMMARY_DIR)
+    self.artifact_writer.write_analysis_json(summary, FRONTEND_SHARED_SUMMARY_DIR)
 
-    # [Excel 보고서 저장] 상세 데이터용(Excel progress 콜백)
+    # Excel
     def excel_progress_callback(current, total, message):
       steps.progress(current, total, message, channel="Excel")
 
-    excel_path = reporter.write_report(summary, progress_callback=excel_progress_callback)
+    excel_path = self.reporter.write_report(summary, progress_callback=excel_progress_callback)
+    return excel_path
 
+  def _log_completion(self, excel_path: str) -> None:
     log_banner(
-      "PIPELINE EXECUTION COMPLETE (Artifacts Summary)",
+      PIPELINE_TITLE_COMPLETE,
       color=FG.GREEN,
       line_color=FG.GREEN,
     )
-    self.logger.info(f" Public JSON saved to: {FRONTEND_PUBLIC_SUMMARY_DIR}")
-    self.logger.info(f" Shared JSON saved to: {FRONTEND_SHARED_SUMMARY_DIR}")
-    self.logger.info(f" Excel Report saved to: {excel_path}")
 
-    log_banner("PIPELINE FINISHED", color=FG.YELLOW, line_color=FG.YELLOW)
+    self.logger.info(
+      PIPELINE_LOG_SAVED.format(label="Public JSON", path=FRONTEND_PUBLIC_SUMMARY_DIR)
+    )
+    self.logger.info(
+      PIPELINE_LOG_SAVED.format(label="Shared JSON", path=FRONTEND_SHARED_SUMMARY_DIR)
+    )
+    self.logger.info(
+      PIPELINE_LOG_SAVED.format(label="Backend JSON", path=OUTPUT_BACK_DIR)
+    )
+    self.logger.info(
+      PIPELINE_LOG_SAVED.format(label="Excel Report", path=excel_path)
+    )
+
+    log_banner(PIPELINE_TITLE_FINISHED, color=FG.YELLOW, line_color=FG.YELLOW)
