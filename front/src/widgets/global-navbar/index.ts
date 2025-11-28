@@ -1,0 +1,1 @@
+export {GlobalNavbar} from '@/widgets/global-navbar/global-navbar';
