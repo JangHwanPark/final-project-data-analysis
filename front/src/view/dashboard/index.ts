@@ -1,0 +1,1 @@
+export {DashboardPage} from '@/srcview/dashboard/dashboard-page';
