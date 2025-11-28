@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function MainPage({ stats }: Props) {
-  const { overview, difficultyDistribution } = stats;
+  const { overview } = stats;
   const latest = format(new Date(overview.latestCreatedAt), 'yyyy-MM-dd');
   const difficultyVM = buildDifficultyChartVM(stats);
   const trendVM = buildTrendChartVM(stats);
@@ -30,7 +30,7 @@ export function MainPage({ stats }: Props) {
       <MainHeader
         badgeText={MAIN_DASHBOARD.BADGE_TEXT}
         title={MAIN_DASHBOARD.TITLE}
-        description={MAIN_DASHBOARD.DESCRIPTION(overview.daysSpan)}
+        description={MAIN_DASHBOARD.DESCRIPTION}
         metaLabel={MAIN_DASHBOARD.META_LABEL}
         metaValue={latest}
       />
