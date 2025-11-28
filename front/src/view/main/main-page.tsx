@@ -266,13 +266,7 @@ export function MainPage({stats}: MainPageProps) {
                       'dark:border-zinc-800 dark:bg-zinc-950/60 dark:shadow-none',
                   )}
               >
-                <div
-                    className="mb-3 flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                  <span>입력 타입 분포</span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                Array / String / Tree 등
-              </span>
-                </div>
+                <SectionHeader title="입력 타입 분포" right="Array / String / Tree 등"/>
                 <div className="h-64">
                   <SharedBarChart
                       data={inputTypeBarData}
@@ -291,13 +285,7 @@ export function MainPage({stats}: MainPageProps) {
                       'dark:border-zinc-800 dark:bg-zinc-950/60 dark:shadow-none',
                   )}
               >
-                <div
-                    className="mb-3 flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                  <span>상위 태그 Top 5</span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                가장 많이 등장한 태그
-              </span>
-                </div>
+                <SectionHeader title="상위 태그 Top 5" right="가장 많이 등장한 태그"/>
                 <div className="space-y-2 text-xs">
                   {topTags.map(([tag, count], idx) => (
                       <div
