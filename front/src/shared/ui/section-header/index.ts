@@ -1,0 +1,1 @@
+export { SectionHeader } from '@/shared/ui/section-header/section-header';

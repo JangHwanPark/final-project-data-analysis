@@ -1,7 +1,7 @@
 'use client';
 
-import { format } from 'date-fns';
-import { motion } from 'framer-motion';
+import {format} from 'date-fns';
+import {motion} from 'framer-motion';
 import {
   Bar,
   BarChart,
@@ -15,10 +15,11 @@ import {
   YAxis,
   Cell,
 } from 'recharts';
-import type { StatsSummary, DifficultyKey } from '@/entities/summary/types';
-import { cn, MOTION_VARIANTS, FORMAT } from '@/shared/lib';
+import type {StatsSummary, DifficultyKey} from '@/entities/summary/types';
+import {cn, MOTION_VARIANTS, FORMAT} from '@/shared/lib';
 import {Footer} from "@/widgets/footer";
 import {GlobalNavbar} from "@/widgets/global-navbar/global-navbar";
+import {SectionHeader, SharedBarChart} from "@/shared";
 
 type MainPageProps = {
   stats: StatsSummary;
@@ -39,7 +40,7 @@ const INPUT_TYPE_COLORS = [
   '#e11d48',
 ];
 
-export function MainPage({ stats }: MainPageProps) {
+export function MainPage({stats}: MainPageProps) {
   const {
     overview,
     difficultyDistribution,
@@ -100,7 +101,7 @@ export function MainPage({ stats }: MainPageProps) {
           <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div className="space-y-2">
               <p className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300">
-                <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"/>
                 알고리즘 문제 세트 통계
               </p>
               <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -166,19 +167,14 @@ export function MainPage({ stats }: MainPageProps) {
                       'dark:border-zinc-800 dark:bg-zinc-950/60 dark:shadow-none',
                   )}
               >
-                <div className="mb-3 flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                  <span>날짜별 문제 수</span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                총 {overview.totalQuestions.toLocaleString('ko-KR')}문제
-              </span>
-                </div>
+                <SectionHeader title="날짜별 문제 수" right={`총 ${overview.totalQuestions.toLocaleString("ko-KR")}문제`}/>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={problemsPerDay}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7"/>
+                      <XAxis dataKey="date"/>
+                      <YAxis/>
+                      <Tooltip/>
                       <Bar
                           dataKey="count"
                           fill="#6366f1"
@@ -196,12 +192,7 @@ export function MainPage({ stats }: MainPageProps) {
                       'dark:border-zinc-800 dark:bg-zinc-950/60 dark:shadow-none',
                   )}
               >
-                <div className="mb-3 flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                  <span>난이도 분포</span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                Hard / Medium / Easy 비율
-              </span>
-                </div>
+                <SectionHeader title="난이도 분포" right="Hard / Medium / Easy 비율"/>
                 <div className="flex h-64 flex-col items-center justify-center gap-4 sm:flex-row">
                   <div className="h-40 w-40">
                     <ResponsiveContainer width="100%" height="100%">
@@ -244,7 +235,7 @@ export function MainPage({ stats }: MainPageProps) {
                               <div className="flex items-center gap-2">
                         <span
                             className="h-2 w-2 rounded-full"
-                            style={{ backgroundColor: DIFFICULTY_COLORS[key] }}
+                            style={{backgroundColor: DIFFICULTY_COLORS[key]}}
                         />
                                 <span className="font-medium">{key}</span>
                               </div>
@@ -275,32 +266,21 @@ export function MainPage({ stats }: MainPageProps) {
                       'dark:border-zinc-800 dark:bg-zinc-950/60 dark:shadow-none',
                   )}
               >
-                <div className="mb-3 flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                <div
+                    className="mb-3 flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
                   <span>입력 타입 분포</span>
                   <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 Array / String / Tree 등
               </span>
                 </div>
                 <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={inputTypeBarData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="value" name="비율(%)">
-                        {inputTypeBarData.map((_, index) => (
-                            <Cell
-                                key={`cell-${index}`}
-                                fill={
-                                  INPUT_TYPE_COLORS[index % INPUT_TYPE_COLORS.length]
-                                }
-                            />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <SharedBarChart
+                      data={inputTypeBarData}
+                      xKey="name"
+                      valueKey="value"
+                      colors={INPUT_TYPE_COLORS}
+                      showLegend={true}
+                  />
                 </div>
               </div>
 
@@ -311,7 +291,8 @@ export function MainPage({ stats }: MainPageProps) {
                       'dark:border-zinc-800 dark:bg-zinc-950/60 dark:shadow-none',
                   )}
               >
-                <div className="mb-3 flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                <div
+                    className="mb-3 flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
                   <span>상위 태그 Top 5</span>
                   <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 가장 많이 등장한 태그
