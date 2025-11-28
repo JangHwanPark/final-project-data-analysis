@@ -3,3 +3,4 @@ openpyxl
 matplotlib
 seaborn
 jupyter
+questionary
