@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 import questionary
-from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
+
+# MAC 설정 (윈도우 모듈)
+try:
+  from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
+except (ImportError, AssertionError):
+  class NoConsoleScreenBufferError(Exception):
+    pass
 
 from app.options import PipelineOptions
 from infrastructure.config import DATA_FILE

@@ -27,7 +27,7 @@ def ensure_venv(
     # parents[1] = infrastructure
     # parents[2] = src
     # parents[3] = back  <-- 여기를 프로젝트 루트로 가정
-    project_root = Path(__file__).resolve().parents[2]
+    project_root = Path(__file__).resolve().parents[3]
 
   venv_dir = project_root / ".venv"
 
