@@ -1,0 +1,1 @@
+export { MainPage } from "@/view/main/main-page";

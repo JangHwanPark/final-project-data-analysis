@@ -1,1 +1,1 @@
-export {DashboardPage} from '@/srcview/dashboard/dashboard-page';
+export {DashboardPage} from '@/view/dashboard/dashboard-page';

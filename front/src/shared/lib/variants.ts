@@ -1,5 +1,5 @@
 import {Variants} from "framer-motion";
-import { MOTION } from '@/src/shared/lib/motion';
+import { MOTION } from '@/shared/lib';
 // 페이드 인 + 살짝 위에서
 const fadeInUp = (delay = 0): Variants => ({
   hidden: { opacity: 0, y: 12 },

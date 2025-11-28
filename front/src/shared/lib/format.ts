@@ -4,7 +4,7 @@ const truncate = (value: string, maxLength: number) => value.length <= maxLength
 // 0.1234 -> "12.34%"
 const percent = (value: number, digits = 0) => `${(value * 100).toFixed(digits)}%`;
 
-export const format = {
+export const FORMAT = {
   truncate,
   percent
 }
