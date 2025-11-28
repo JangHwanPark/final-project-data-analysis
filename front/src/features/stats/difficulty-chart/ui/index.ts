@@ -1,0 +1,1 @@
+export { DifficultyChart } from '@/features/stats/difficulty-chart/ui/difficulty-chart';

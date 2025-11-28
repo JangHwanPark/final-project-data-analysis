@@ -1,0 +1,1 @@
+export type {TrendChartVM} from '@/features/stats/trend-chart/model/types';

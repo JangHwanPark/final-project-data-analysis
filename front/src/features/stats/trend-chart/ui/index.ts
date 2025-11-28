@@ -1,0 +1,1 @@
+export { TrendChart } from '@/features/stats/trend-chart/ui/trend-chart';

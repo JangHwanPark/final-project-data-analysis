@@ -1,0 +1,1 @@
+export { InputTypeChart } from '@/features/stats/input-type-chart/ui/input-type-chart';

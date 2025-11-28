@@ -1,0 +1,1 @@
+export {TopTags} from '@/features/stats/top-tags/ui/top-tags';

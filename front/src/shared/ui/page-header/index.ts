@@ -1,0 +1,1 @@
+export { PageHeader } from '@/shared/ui/page-header/page-header';

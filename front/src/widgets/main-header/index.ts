@@ -1,0 +1,1 @@
+export { MainHeader } from '@/widgets/main-header/main-header';
