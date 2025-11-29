@@ -28,6 +28,8 @@ class DatasetSummary:
   overview: OverviewStats
   # metrics의 모든 복잡한 구조를 담기 위해 Dict[str, Any]로 정의
   metrics: Dict[str, Any] = field(default_factory=dict)
+  # 생성 시간을 담을 필드(기본값 = 빈 문자열)
+  generated_at: str = ""
 
   def to_dict(self) -> Dict[str, Any]:
     # DatasetSummary 객체를 JSON 직렬화 가능한 딕셔너리로 변환
@@ -38,7 +40,7 @@ class DatasetSummary:
     return {
       "overview": self.overview.to_dict(),
       "metrics": self.metrics,
-      "timestamp": "GENERATED_TIMESTAMP_PLACEHOLDER"  # ArtifactWriter에서 업데이트될 예정
+      "timestamp": self.generated_at
     }
 
 
@@ -51,9 +53,7 @@ class QuestionData:
 
 @dataclass
 class DifficultySummary:
-  """
-  난이도별 요약 통계를 저장하는 DTO (Data Transfer Object).
-  """
+  # 난이도별 요약 통계를 저장하는 DTO (Data Transfer Object).
   difficulty: str
   count: int
   avg_acceptance_rate: float
@@ -68,12 +68,11 @@ class AnalysisResult:
   # 전반적인 데이터셋 메타데이터
   total_records: int
   unique_difficulties: List[str]
-
   # 난이도별 상세 요약 목록
   difficulty_summaries: List[DifficultySummary] = field(default_factory=list)
-
   # 카테고리별 분포 (dict: category -> count)
   category_distribution: Dict[str, int] = field(default_factory=dict)
+  timestamp: str = ""
 
   # JSON 직렬화를 위한 헬퍼 메서드
   def to_json_serializable(self) -> Dict[str, Any]:
@@ -94,7 +93,7 @@ class AnalysisResult:
       "metadata": {
         "total_records": self.total_records,
         "unique_difficulties": self.unique_difficulties,
-        "timestamp": "GENERATED_TIMESTAMP_PLACEHOLDER"  # 런타임에 삽입될 예정
+        "timestamp": self.timestamp
       },
       "summaries": {
         "difficulty_stats": summaries_list,

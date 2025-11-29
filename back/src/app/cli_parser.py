@@ -51,15 +51,12 @@ def parse_arguments() -> tuple[PipelineOptions, bool]:
   # 비대화형 모드(--no-interactive)일 때 사용할 기본 옵션 및 경로 설정
   options = PipelineOptions(
     data_file=args.data_file,
-    generate_charts=True,
-    generate_excel=True,
     engine=args.engine,
     analysis_scope="full",
     output_targets={"json", "excel", "charts"},
     json_dir=ArtifactsPaths.JSON,
     charts_dir=ArtifactsPaths.CHARTS,
     xlsx_dir=ArtifactsPaths.XLSX,
-    summaries_dir=ArtifactsPaths.SUMMARIES
   )
 
   interactive = not args.no_interactive

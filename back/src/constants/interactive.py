@@ -5,7 +5,7 @@ from questionary import Choice
 # =======================================================================
 OUTPUT_TARGET_CHOICES = [
     Choice("JSON", checked=True),
-    Choice("Excel", checked=True),
+    Choice("Excel", checked=False),
     Choice("Charts (images)", checked=False),
 ]
 

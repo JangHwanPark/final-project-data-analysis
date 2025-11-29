@@ -1,6 +1,14 @@
+from enum import Enum
+from typing import Literal
+
 # ====================================================
 # PIPELINE OPTIONS
 # ====================================================
-from typing import Literal
-AnalysisScope = Literal["full", "basic", "custom"]
+# AnalysisScope = Literal["full", "basic", "custom"]
+class AnalysisScope(str, Enum):
+  FULL = "full"
+  BASIC = "basic"
+  CUSTOM = "custom"
+
+
 OutputTarget = Literal["json", "excel", "charts"]

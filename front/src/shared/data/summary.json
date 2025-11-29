@@ -19,16 +19,6 @@
                 "Easy": 29.71
             }
         },
-        "avg_description_length_by_difficulty": {
-            "Easy": 204.21,
-            "Hard": 346.12,
-            "Medium": 268.61
-        },
-        "avg_test_cases_by_difficulty": {
-            "Easy": 5.17,
-            "Hard": 5.41,
-            "Medium": 5.35
-        },
         "algorithm_category_distribution": {
             "counts": {
                 "Uncategorized": 301,
@@ -79,6 +69,24 @@
                 "Graph": 0.81
             }
         },
+        "output_type_distribution": {
+            "counts": {
+                "Integer": 616
+            },
+            "percentages": {
+                "Integer": 100.0
+            }
+        },
+        "negative_one_output_problems_ratio": {
+            "counts": {
+                "false": 533,
+                "true": 83
+            },
+            "percentages": {
+                "false": 86.53,
+                "true": 13.47
+            }
+        },
         "top_tags_distribution": {
             "array": 377,
             "tree": 120,
@@ -91,17 +99,15 @@
             "queue": 8,
             "interval": 6
         },
-        "example_count_distribution": {
-            "0": 0,
-            "1": 0,
-            "2": 608,
-            "3+": 8
+        "avg_description_length_by_difficulty": {
+            "Easy": 204.21,
+            "Hard": 346.12,
+            "Medium": 268.61
         },
-        "test_case_count_distribution": {
-            "0-1": 0,
-            "2-3": 0,
-            "4-6": 556,
-            "7+": 60
+        "avg_test_cases_by_difficulty": {
+            "Easy": 5.17,
+            "Hard": 5.41,
+            "Medium": 5.35
         },
         "example_testcase_by_difficulty": {
             "Easy": {
@@ -116,6 +122,18 @@
                 "num_examples": 2.02,
                 "num_test_cases": 5.35
             }
+        },
+        "example_count_distribution": {
+            "0": 0,
+            "1": 0,
+            "2": 608,
+            "3+": 8
+        },
+        "test_case_count_distribution": {
+            "0-1": 0,
+            "2-3": 0,
+            "4-6": 556,
+            "7+": 60
         },
         "description_length_bucket_distribution": {
             "0-200": 218,
@@ -153,24 +171,6 @@
                 "Medium": 45
             }
         ],
-        "output_type_distribution": {
-            "counts": {
-                "Integer": 616
-            },
-            "percentages": {
-                "Integer": 100.0
-            }
-        },
-        "negative_one_output_problems_ratio": {
-            "counts": {
-                "false": 533,
-                "true": 83
-            },
-            "percentages": {
-                "false": 86.53,
-                "true": 13.47
-            }
-        },
         "difficulty_algorithm_matrix": {
             "Easy": {
                 "Binary Search": 10,
@@ -251,5 +251,6 @@
             "given_graph": 8,
             "return_true_false": 1
         }
-    }
+    },
+    "timestamp": "2025-11-29T23:18:01.587135"
 }

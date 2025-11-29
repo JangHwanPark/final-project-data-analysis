@@ -78,7 +78,7 @@ class ChartExporter:
     plt.figure(figsize=(10, 6))
     df = pd.Series(data).sort_values(ascending=False).to_frame(name="Count")
 
-    sns.barplot(x=df.index, y="Count", data=df, palette="viridis")
+    sns.barplot(x=df.index, y="Count", data=df, palette="viridis", hue=df.index, legend=False)
     plt.title("Problem Count by Difficulty Level")
     plt.xlabel("Difficulty")
     plt.ylabel("Count")
@@ -100,7 +100,7 @@ class ChartExporter:
     plt.figure(figsize=(12, 6))
     df = pd.Series(data).sort_values(ascending=False).head(15).to_frame(name="Count")
 
-    sns.barplot(x="Count", y=df.index, data=df, palette="rocket")
+    sns.barplot(x="Count", y=df.index, data=df, palette="rocket", hue=df.index, legend=False)
     plt.title("Top Algorithm Categories")
     plt.xlabel("Count")
     plt.ylabel("Category")
@@ -121,7 +121,7 @@ class ChartExporter:
     plt.figure(figsize=(12, 6))
     df = pd.Series(data).sort_values(ascending=False).head(15).to_frame(name="Count")
 
-    sns.barplot(x="Count", y=df.index, data=df, palette="mako")
+    sns.barplot(x="Count", y=df.index, data=df, palette="mako", hue=df.index, legend=False)
     plt.title("Top 15 Problem Tags")
     plt.xlabel("Frequency")
     plt.ylabel("Tag")

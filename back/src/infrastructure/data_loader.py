@@ -5,7 +5,7 @@ from typing import Optional, Any
 
 # Infrastructure Dependencies
 from infrastructure.logging import get_logger
-from infrastructure.config import ENCODING, DATE_COLUMNS
+from config.default import ENCODING, DATE_COLUMNS
 
 # Domain Dependencies
 from domain.entities.data_model import QuestionData

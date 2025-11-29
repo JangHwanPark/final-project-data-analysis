@@ -14,8 +14,8 @@ ROOT_DIR: Final[Path] = Path(__file__).parents[2].resolve()
 # =================================================================
 class DataPaths:
   ROOT: Final[Path] = ROOT_DIR / "data"
-  QUESTIONS_DIR: Final[Path] = ROOT / "coding_questions"
-  QUESTIONS_FILE: Final[Path] = QUESTIONS_DIR / "coding_questions.csv"
+  QUESTIONS_DIR: Final[Path] = ROOT / "coding-questions-dataset"
+  QUESTIONS_FILE: Final[Path] = QUESTIONS_DIR / "questions_dataset.csv"
 
 
 # =================================================================
@@ -43,3 +43,12 @@ class FrontendPaths:
   # 실제 저장될 파일 경로 (DIR -> FILE로 명칭 변경 추천)
   PUBLIC_SUMMARY_FILE: Final[Path] = PUBLIC_DATA_DIR / "summary.json"
   SHARED_SUMMARY_FILE: Final[Path] = SHARED_DATA_DIR / "summary.json"
+
+
+# =================================================================
+# artifacts 디렉토리를 자동으로 생성하는 유틸
+# =================================================================
+def ensure_directories() -> None:
+  ArtifactsPaths.ROOT.mkdir(parents=True, exist_ok=True)
+  ArtifactsPaths.SUMMARIES.mkdir(parents=True, exist_ok=True)
+  ArtifactsPaths.CHARTS.mkdir(parents=True, exist_ok=True)

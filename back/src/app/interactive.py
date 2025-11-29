@@ -3,8 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 import questionary
 
-from constants.path import ArtifactsPaths
-
 # MAC 설정 (윈도우 모듈)
 try:
   # 윈도우 콘솔에서 버퍼가 없는 환경일 때 발생하는 예외
@@ -15,10 +13,14 @@ except (ImportError, AssertionError):
     """윈도우 콘솔 버퍼 관련 예외 더미 클래스 (비윈도우 환경용)."""
     pass
 
-from typing import Set
+from typing import Any, Dict, Set, List, Tuple
+from constants.path import (
+  ArtifactsPaths,
+  FrontendPaths,
+)
 from app_types.pipelien import AnalysisScope, OutputTarget
 from app.pipeline_options import PipelineOptions
-from infrastructure.config import DATA_FILE
+from constants.path import DataPaths
 from infrastructure.logging import get_logger
 from constants.interactive import (
   OUTPUT_TARGET_CHOICES,
@@ -65,16 +67,16 @@ def ask_data_file(engine: str) -> Path:
     file_type_label = "데이터"
 
   use_default = questionary.confirm(
-    f"기본 {file_type_label} 파일을 사용할까요?\n  -> {DATA_FILE}",
+    f"기본 {file_type_label} 파일을 사용할까요?\n  -> {DataPaths.QUESTIONS_FILE}",
     default=True,
   ).ask()
 
   if use_default:
-    return DATA_FILE
+    return DataPaths.QUESTIONS_FILE
 
   path_str = questionary.path(
     f"분석할 {file_type_label} 파일 경로를 입력하거나 선택하세요.",
-    default=str(DATA_FILE),
+    default=str(DataPaths.QUESTIONS_FILE),
   ).ask()
 
   # 사용자가 취소(Ctrl+C 등)하거나 None/빈 문자열을 입력한 경우
@@ -83,7 +85,7 @@ def ask_data_file(engine: str) -> Path:
       f"입력이 없어서 기본 {file_type_label} 파일을 사용합니다.",
       style="italic",
     )
-    return DATA_FILE
+    return DataPaths.QUESTIONS_FILE
 
   return Path(path_str)
 
@@ -200,6 +202,7 @@ def ask_artifact_paths(output_targets: Set[OutputTarget], generate_charts: bool,
       paths["xlsx_dir"] = Path(x_path)
   return paths
 
+
 # ====================================================
 # 사용자가 선택한 옵션을 요약해서 출력
 # ====================================================
@@ -208,6 +211,11 @@ def print_summary(
         engine: str,
         analysis_scope: str,
         output_targets: set[str],
+        json_dir: Path,
+        charts_dir: Path,
+        xlsx_dir: Path,
+        # frontend_json_targets: List[Tuple[Path, str]]
+        frontend_json_targets: list
 ) -> None:
   questionary.print(
     "\n[선택한 옵션 요약]",
@@ -217,6 +225,14 @@ def print_summary(
   questionary.print(f" - engine: {engine}")
   questionary.print(f" - analysis_scope: {analysis_scope}")
   questionary.print(f" - output_targets: {sorted(output_targets)}\n")
+  questionary.print(f" - json_dir: {json_dir}")
+  questionary.print(f" - charts_dir: {charts_dir}")
+  questionary.print(f" - xlsx_dir: {xlsx_dir}")
+  questionary.print(f" - frontend_json_targets (Total: {len(frontend_json_targets)}):")
+  for path, filename, scope in frontend_json_targets:
+    # 경로와 파일명 같이 표시
+    questionary.print(f"   -> [{scope.value}] {path} / {filename}")
+  questionary.print("")
 
 
 # ====================================================
@@ -253,8 +269,28 @@ def ask_user_with_questionary() -> PipelineOptions:
   output_targets = ask_output_targets()
 
   # output_targets를 기준으로 기존 플래그 값도 계산
-  generate_charts = ask_generate_charts()
-  generate_excel = ask_generate_excel()
+  # generate_charts = ask_generate_charts()
+  # generate_excel = ask_generate_excel()
+
+  # 저장 경로 확인
+  json_dir = ArtifactsPaths.JSON
+  charts_dir = ArtifactsPaths.CHARTS
+  xlsx_dir = ArtifactsPaths.XLSX
+  frontend_base = FrontendPaths.PUBLIC_DATA_DIR.parent.parent
+  # frontend_json_dirs = [
+  #     FrontendPaths.PUBLIC_DATA_DIR,               # 1. public/data
+  #     frontend_base / "src" / "shared" / "data"    # 2. src/shared/data
+  # ]
+  frontend_targets = [
+    (FrontendPaths.PUBLIC_DATA_DIR, "dashboard_data.json", AnalysisScope.BASIC),
+    (frontend_base / "src" / "shared" / "data", "raw_stats.json", AnalysisScope.FULL)
+  ]
+  # frontend_json_dir = FrontendPaths.PUBLIC_DATA_DIR
+  # artifact_paths = ask_artifact_paths(
+  #   output_targets=output_targets,
+  #   generate_charts=generate_charts,
+  #   generate_excel=generate_excel,
+  # )
 
   # 최종 요약 출력
   print_summary(
@@ -262,6 +298,10 @@ def ask_user_with_questionary() -> PipelineOptions:
     engine=engine,
     analysis_scope=analysis_scope,
     output_targets=output_targets,
+    json_dir=json_dir,
+    charts_dir=charts_dir,
+    xlsx_dir=xlsx_dir,
+    frontend_json_targets=frontend_targets,
   )
 
   # 실행 여부 최종 확인
@@ -271,10 +311,12 @@ def ask_user_with_questionary() -> PipelineOptions:
   return PipelineOptions(
     data_file=data_file,
     engine=engine,
-    generate_charts=generate_charts,
-    generate_excel=generate_excel,
     analysis_scope=analysis_scope,
     output_targets=output_targets,
+    json_dir=json_dir,
+    charts_dir=charts_dir,
+    xlsx_dir=xlsx_dir,
+    frontend_json_targets=frontend_targets,
   )
 
 
@@ -287,25 +329,27 @@ def ask_user_with_fallback() -> PipelineOptions:
   logger.warning("questionary를 사용할 수 없는 환경입니다. 텍스트 모드로 진행합니다.\n")
 
   # CSV 경로 입력
-  path_input = input(f"분석할 CSV 경로 (기본: {DATA_FILE}): ")
-  data_file = Path(path_input) if path_input else DATA_FILE
+  path_input = input(f"분석할 CSV 경로 (기본: {DataPaths.QUESTIONS_FILE}): ")
+  data_file = Path(path_input) if path_input else DataPaths.QUESTIONS_FILE
   logger.info(f"데이터 파일 설정됨: {data_file}")
 
   # 현재는 csv만 지원 (엔진 선택은 생략)
   logger.info("데이터 로딩 엔진: csv(default)")
   engine = "csv"
+  analysis_scope = ask_analysis_scope()
+  output_targets = ask_output_targets()
 
   # 차트/엑셀은 기본 True
-  logger.info("차트 생성: True")
-  logger.info("Excel 생성: True")
-  generate_charts = True
-  generate_excel = True
+  # logger.info("차트 생성: True")
+  # logger.info("Excel 생성: True")
+  # generate_charts = True
+  # generate_excel = True
 
   return PipelineOptions(
     data_file=data_file,
-    generate_charts=generate_charts,
-    generate_excel=generate_excel,
     engine=engine,
+    analysis_scope=analysis_scope,
+    output_targets=output_targets,
   )
 
 

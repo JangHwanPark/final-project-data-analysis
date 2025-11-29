@@ -1,8 +1,7 @@
-from infrastructure.config import (
+from constants.path import (
   ensure_directories,
-  OUTPUT_BACK_DIR,
-  FRONTEND_PUBLIC_SUMMARY_DIR,
-  FRONTEND_SHARED_SUMMARY_DIR,
+  ArtifactsPaths,
+  FrontendPaths,
 )
 from infrastructure.data_loader import DataLoader
 from infrastructure.logging import StepLogger, log_banner
@@ -62,7 +61,7 @@ class DataAnalysisPipeline:
     summary = self._compute_summary(steps, question_data)
 
     # [수정 4] options 객체를 helper 메서드에 전달 (경로 정보가 options에 있음)
-    if options.generate_charts:
+    if options.charts_dir:
       self._generate_charts(steps, summary, options)
 
     excel_path = self._write_artifacts(steps, summary, options)
@@ -108,19 +107,24 @@ class DataAnalysisPipeline:
       self.json_exporter.export(summary, target_path=options.json_dir)
 
       # (옵션) 만약 summaries_dir(공유용)가 별도로 설정되어 있다면 추가 저장
-      if options.summaries_dir:
-        self.json_exporter.export(summary, target_path=options.summaries_dir)
+      if options.json_dir:
+        self.json_exporter.export(summary, target_path=options.json_dir)
+
+    if options.frontend_json_targets:
+      for target_dir, target_filename, target_scope in options.frontend_json_targets:
+        steps.step(f"Saving [{target_scope.value}] to Frontend: {target_filename}")
+        self.json_exporter.export(summary, target_path=target_dir)
+        self.json_exporter.export(summary, target_path=target_dir, filename=target_filename, scope=target_scope)
 
     # 2. Excel 저장
     excel_result = "Skipped"
-    if options.generate_excel and options.xlsx_dir:
+    if options.xlsx_dir and options.xlsx_dir:
       def excel_progress_callback(current, total, message):
         steps.progress(current, total, message, channel="Excel")
 
       # 저장할 전체 파일 경로 생성
       filename = "analysis_report.xlsx"
       filepath = options.xlsx_dir / filename
-
       result_path = self.excel_exporter.export(
         summary,
         filepath=filepath,
@@ -142,7 +146,7 @@ class DataAnalysisPipeline:
     if options.json_dir:
       self.logger.info(PIPELINE_LOG_SAVED.format(label="JSON", path=options.json_dir))
 
-    if options.charts_dir and options.generate_charts:
+    if options.charts_dir and options.charts_dir:
       self.logger.info(PIPELINE_LOG_SAVED.format(label="Charts", path=options.charts_dir))
 
     if excel_path != "Skipped":

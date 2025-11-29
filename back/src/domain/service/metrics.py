@@ -4,9 +4,9 @@ from collections import Counter
 from typing import Any, Dict, Sequence
 
 import pandas as pd
-
+from datetime import datetime
 from infrastructure.logging import get_logger
-from domain.entities.data_model import OverviewStats
+from domain.entities.data_model import OverviewStats, DatasetSummary
 from constants.analysis import (
   EXAMPLE_BINS,
   EXAMPLE_LABELS,
@@ -82,7 +82,7 @@ def _matrix(df: pd.DataFrame, index_col: str, column_col: str) -> Dict[str, Dict
 # =================================================================
 # Main Public API
 # =================================================================
-def compute_statistics(df: pd.DataFrame) -> Dict[str, Any]:
+def compute_statistics(df: pd.DataFrame) -> DatasetSummary:
   if df is None or df.empty:
     logger.error("Input DataFrame is empty or None.")
     raise ValueError("Input DataFrame is empty or None")
@@ -141,6 +141,6 @@ def compute_statistics(df: pd.DataFrame) -> Dict[str, Any]:
     "description_template_usage": count_description_templates(data["description"]),
   }
 
-  result = {"overview": overview.to_dict(), "metrics": metrics}
+  result = DatasetSummary(overview=overview, metrics=metrics, generated_at=datetime.now().isoformat())
   logger.info("Finished computing statistics.")
   return result
