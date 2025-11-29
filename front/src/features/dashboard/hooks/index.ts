@@ -1,0 +1,1 @@
+export { useDashboardTab } from '@/features/dashboard/hooks/useDashboardTab';
