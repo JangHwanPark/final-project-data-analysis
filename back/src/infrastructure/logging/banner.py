@@ -1,17 +1,50 @@
 import logging
 from infrastructure.logging import get_logger
 from infrastructure.logging.style import FG, STYLE, colorize
+from wcwidth import wcswidth
 
- # 배너 전용 로거
+# 배너 전용 로거
 logger = get_logger("banner")
 _SIMPLE_FORMAT = "%(message)s"
 
 for handler in logger.handlers:
-    handler.setFormatter(logging.Formatter(_SIMPLE_FORMAT))
+  handler.setFormatter(logging.Formatter(_SIMPLE_FORMAT))
+
+
+def _display_center(text: str, width: int) -> str:
+  # 실제 표시 폭
+  disp_len = wcswidth(text)
+  if disp_len >= width:
+    return text
+
+  pad_total = width - disp_len
+  left = pad_total // 2
+  right = pad_total - left
+  return " " * left + text + " " * right
+
+
+# ====================================================
+# 여러 줄의 텍스트를 width 기준으로
+# 가운데 정렬 + 색상(굵기) 적용하여 리스트로 반환
+# ====================================================
+def _format_center_lines(
+        text: str,
+        width: int,
+        color: str | None,
+        bold: bool
+):
+  lines = []
+  for part in text.split("\n"):
+    centered = _display_center(part, width)
+    if color:
+      centered = colorize(centered, STYLE.BOLD, color) if bold else colorize(centered, color)
+    lines.append(centered)
+  return lines
+
 
 def log_banner(
         title: str,
-        width: int = 200,
+        width: int = 84,
         color: str | None = FG.CYAN,
         line_color: str | None = FG.BLUE,
         bold: bool = True,
@@ -38,22 +71,15 @@ def log_banner(
   line = "=" * width
 
   # Line 컬러
-  if line_color:
-    line_colored = colorize(line, line_color)
-  else:
-    line_colored = line
+  line_colored = colorize(line, line_color) if line_color else line
 
-  # Title 컬러 + Bold 옵션
-  title_text = title.center(width)
-  if color:
-    if bold:
-      title_text = colorize(title_text, STYLE.BOLD, color)
-    else:
-      title_text = colorize(title_text, color)
+  # Multi-line formatting
+  formatted_lines = _format_center_lines(title, width, color, bold)
 
   # 출력
   logger.info(line_colored)
-  logger.info(title_text)
+  for fl in formatted_lines:
+    logger.info(fl)
   logger.info(line_colored)
 
   if newline_after:

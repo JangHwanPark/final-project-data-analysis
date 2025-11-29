@@ -12,7 +12,7 @@ from domain.service.metrics import compute_statistics
 from domain.entities.data_model import QuestionData, DatasetSummary
 from presentation.visualizer import Visualizer
 from presentation.reports.excel_reporter import ExcelReporter
-from .options import PipelineOptions
+from .pipeline_options import PipelineOptions
 from constants.messages import (
   PIPELINE_VERSION,
   PIPELINE_TITLE_START,
@@ -26,6 +26,7 @@ from constants.messages import (
   PIPELINE_STEP_SAVE_ARTIFACTS,
   PIPELINE_STEP_WRITE_JSON,
   PIPELINE_LOG_SAVED,
+  PIPELINE_ENGINE_NOTE,
 )
 
 
@@ -71,13 +72,10 @@ class DataAnalysisPipeline:
   # ====================================================
   # private helper methods
   # ====================================================
-
   def _log_start_banner(self) -> None:
-    log_banner(
-      PIPELINE_TITLE_START.format(version=PIPELINE_VERSION),
-      color=FG.CYAN,
-      line_color=FG.BLUE,
-    )
+    title = PIPELINE_TITLE_START.format(version=PIPELINE_VERSION)
+    engine_note = PIPELINE_ENGINE_NOTE.format(version=PIPELINE_VERSION)
+    log_banner(f"{title}\n\n{engine_note}", color=FG.CYAN, line_color=FG.BLUE, )
 
   def _prepare_infrastructure(self, steps: StepLogger) -> None:
     steps.step(PIPELINE_STEP_ENSURE_DIRS)

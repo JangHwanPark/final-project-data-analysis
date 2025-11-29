@@ -100,7 +100,7 @@ def _extract_problem_tags(text: str) -> list[str]:
 
 
 def _infer_output_type(cases: Sequence[dict]) -> str:
-  """테스트 케이스의 예상 출력을 기반으로 출력 데이터 타입을 추론합니다 (상수 사용)."""
+  # 테스트 케이스의 예상 출력을 기반으로 출력 데이터 타입을 추론합니다 (상수 사용).
   for case in cases:
     expected = case.get("expected_output") if isinstance(case, dict) else None
     if expected is None:
