@@ -6,13 +6,11 @@ ensure_venv(module_to_run="app.main")
 
 from pathlib import Path
 from infrastructure.data_loader import DataLoader
-from infrastructure.artifact_writer import ArtifactWriter
-from presentation.visualizer import Visualizer
-from presentation.reports.excel_reporter import ExcelReporter
 from infrastructure.logging import get_logger, log_banner
 from infrastructure.logging.style import FG
 from app.pipeline import DataAnalysisPipeline
 from app.interactive import ask_user_for_options
+from presentation.exporters import JsonExporter, ExcelExporter, ChartExporter
 from app.cli_parser import parse_arguments
 from constants.messages import (
   PIPELINE_INTERACTIVE_ENABLED,
@@ -30,9 +28,9 @@ def run_pipeline():
   pipeline = DataAnalysisPipeline(
     logger=logger,
     data_loader=DataLoader(),
-    visualizer=Visualizer(),
-    artifact_writer=ArtifactWriter(),
-    reporter=ExcelReporter(),
+    chart_exporter=ChartExporter(),
+    json_exporter=JsonExporter(),
+    excel_exporter=ExcelExporter(),
   )
 
   if interactive:

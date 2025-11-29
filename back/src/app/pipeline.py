@@ -5,13 +5,11 @@ from infrastructure.config import (
   FRONTEND_SHARED_SUMMARY_DIR,
 )
 from infrastructure.data_loader import DataLoader
-from infrastructure.artifact_writer import ArtifactWriter
 from infrastructure.logging import StepLogger, log_banner
 from infrastructure.logging.style import FG
 from domain.service.metrics import compute_statistics
 from domain.entities.data_model import QuestionData, DatasetSummary
-from presentation.visualizer import Visualizer
-from presentation.reports.excel_reporter import ExcelReporter
+from presentation.exporters import JsonExporter, ExcelExporter, ChartExporter
 from .pipeline_options import PipelineOptions
 from constants.messages import (
   PIPELINE_VERSION,
@@ -30,24 +28,25 @@ from constants.messages import (
 )
 
 
+# ====================================================
+# 애플리케이션 계층의 데이터 분석 파이프라인 유즈케이스.
+# 인프라/프리젠테이션 레이어의 구현(DataLoader, Visualizer, ArtifactWriter, ExcelReporter)을
+# 주입 받아 orchestration만 담당.
+# ====================================================
 class DataAnalysisPipeline:
-  # 애플리케이션 계층의 데이터 분석 파이프라인 유즈케이스.
-  # 인프라/프리젠테이션 레이어의 구현(DataLoader, Visualizer, ArtifactWriter, ExcelReporter)을
-  #  주입 받아 orchestration만 담당한다.
-
   def __init__(
           self,
           logger,
           data_loader: DataLoader,
-          visualizer: Visualizer,
-          artifact_writer: ArtifactWriter,
-          reporter: ExcelReporter,
+          chart_exporter: ChartExporter,
+          json_exporter: JsonExporter,
+          excel_exporter: ExcelExporter,
   ) -> None:
     self.logger = logger
     self.data_loader = data_loader
-    self.visualizer = visualizer
-    self.artifact_writer = artifact_writer
-    self.reporter = reporter
+    self.chart_exporter = chart_exporter
+    self.json_exporter = json_exporter
+    self.excel_exporter = excel_exporter
 
   def run(self, options: PipelineOptions) -> None:
     steps = StepLogger(logger_name=self.logger.name)
@@ -62,12 +61,13 @@ class DataAnalysisPipeline:
 
     summary = self._compute_summary(steps, question_data)
 
+    # [수정 4] options 객체를 helper 메서드에 전달 (경로 정보가 options에 있음)
     if options.generate_charts:
-      self._generate_charts(steps, summary)
+      self._generate_charts(steps, summary, options)
 
-    excel_path = self._write_artifacts(steps, summary)
+    excel_path = self._write_artifacts(steps, summary, options)
 
-    self._log_completion(excel_path)
+    self._log_completion(excel_path, options)
 
   # ====================================================
   # private helper methods
@@ -89,45 +89,63 @@ class DataAnalysisPipeline:
     steps.step(PIPELINE_STEP_COMPUTE_STATS)
     return compute_statistics(question_data.df)
 
-  def _generate_charts(self, steps: StepLogger, summary: DatasetSummary) -> None:
-    steps.step(PIPELINE_STEP_GENERATE_CHARTS)
-    self.visualizer.create_and_save_charts(summary)
+  # [수정 5] ChartExporter 사용 및 export 메서드 호출
+  def _generate_charts(self, steps: StepLogger, summary: DatasetSummary, options: PipelineOptions) -> None:
+    if not options.charts_dir:
+      self.logger.warning("차트 생성이 활성화되었으나 저장 경로(charts_dir)가 설정되지 않았습니다.")
+      return
 
-  def _write_artifacts(self, steps: StepLogger, summary: DatasetSummary) -> str:
-    # JSON(3곳) + Excel 저장을 처리하고, Excel 경로를 반환한다.
+    steps.step(PIPELINE_STEP_GENERATE_CHARTS)
+    self.chart_exporter.export(summary, output_dir=options.charts_dir)
+
+  # [수정 6] Json/Excel Exporter 사용 및 options 경로 활용
+  def _write_artifacts(self, steps: StepLogger, summary: DatasetSummary, options: PipelineOptions) -> str:
     steps.step(PIPELINE_STEP_SAVE_ARTIFACTS)
 
-    # JSON
-    steps.step(PIPELINE_STEP_WRITE_JSON.format(target=OUTPUT_BACK_DIR.name))
-    self.artifact_writer.write_analysis_json(summary, OUTPUT_BACK_DIR)
-    self.artifact_writer.write_analysis_json(summary, FRONTEND_PUBLIC_SUMMARY_DIR)
-    self.artifact_writer.write_analysis_json(summary, FRONTEND_SHARED_SUMMARY_DIR)
+    # 1. JSON 저장
+    if options.json_dir:
+      steps.step(PIPELINE_STEP_WRITE_JSON.format(target=options.json_dir.name))
+      self.json_exporter.export(summary, target_path=options.json_dir)
 
-    # Excel
-    def excel_progress_callback(current, total, message):
-      steps.progress(current, total, message, channel="Excel")
+      # (옵션) 만약 summaries_dir(공유용)가 별도로 설정되어 있다면 추가 저장
+      if options.summaries_dir:
+        self.json_exporter.export(summary, target_path=options.summaries_dir)
 
-    excel_path = self.reporter.write_report(summary, progress_callback=excel_progress_callback)
-    return excel_path
+    # 2. Excel 저장
+    excel_result = "Skipped"
+    if options.generate_excel and options.xlsx_dir:
+      def excel_progress_callback(current, total, message):
+        steps.progress(current, total, message, channel="Excel")
 
-  def _log_completion(self, excel_path: str) -> None:
+      # 저장할 전체 파일 경로 생성
+      filename = "analysis_report.xlsx"
+      filepath = options.xlsx_dir / filename
+
+      result_path = self.excel_exporter.export(
+        summary,
+        filepath=filepath,
+        progress_callback=excel_progress_callback
+      )
+
+      if result_path:
+        excel_result = str(result_path)
+
+    return excel_result
+
+  def _log_completion(self, excel_path: str, options: PipelineOptions) -> None:
     log_banner(
       PIPELINE_TITLE_COMPLETE,
       color=FG.GREEN,
       line_color=FG.GREEN,
     )
 
-    self.logger.info(
-      PIPELINE_LOG_SAVED.format(label="Public JSON", path=FRONTEND_PUBLIC_SUMMARY_DIR)
-    )
-    self.logger.info(
-      PIPELINE_LOG_SAVED.format(label="Shared JSON", path=FRONTEND_SHARED_SUMMARY_DIR)
-    )
-    self.logger.info(
-      PIPELINE_LOG_SAVED.format(label="Backend JSON", path=OUTPUT_BACK_DIR)
-    )
-    self.logger.info(
-      PIPELINE_LOG_SAVED.format(label="Excel Report", path=excel_path)
-    )
+    if options.json_dir:
+      self.logger.info(PIPELINE_LOG_SAVED.format(label="JSON", path=options.json_dir))
+
+    if options.charts_dir and options.generate_charts:
+      self.logger.info(PIPELINE_LOG_SAVED.format(label="Charts", path=options.charts_dir))
+
+    if excel_path != "Skipped":
+      self.logger.info(PIPELINE_LOG_SAVED.format(label="Excel Report", path=excel_path))
 
     log_banner(PIPELINE_TITLE_FINISHED, color=FG.YELLOW, line_color=FG.YELLOW)

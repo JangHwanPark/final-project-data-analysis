@@ -3,6 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 import questionary
 
+from constants.path import ArtifactsPaths
+
 # MAC 설정 (윈도우 모듈)
 try:
   # 윈도우 콘솔에서 버퍼가 없는 환경일 때 발생하는 예외
@@ -30,6 +32,7 @@ from constants.interactive import (
 )
 
 logger = get_logger("interactive-fallback")
+
 
 # ====================================================
 # Questionary 기반 입력 함수들
@@ -70,7 +73,7 @@ def ask_data_file(engine: str) -> Path:
     return DATA_FILE
 
   path_str = questionary.path(
-    f"분석할 {file_type_label} 파일 경로를 입력하거나 선택하세요:",
+    f"분석할 {file_type_label} 파일 경로를 입력하거나 선택하세요.",
     default=str(DATA_FILE),
   ).ask()
 
@@ -151,7 +154,54 @@ def ask_generate_excel() -> bool:
 
 
 # ====================================================
-#
+# 저장 경로 설정 함수
+# 기본 구조(artifacts/...)를 쓸지 커스텀 경로를 쓸지 묻는다.
+# 저장 경로를 결정하여 PipelineOptions에 들어갈 인자 딕셔너리를 반환
+# ====================================================
+def ask_artifact_paths(output_targets: Set[OutputTarget], generate_charts: bool, generate_excel: bool) -> Dict[str, Any]:
+  # 기본 구조 사용 여부 질문
+  use_default = questionary.confirm(
+    "결과물을 기본 'artifacts/' 폴더 구조(charts, json, xlsx)에 저장할까요?",
+    default=True
+  ).ask()
+
+  paths = {
+    "json_dir": None,
+    "charts_dir": None,
+    "xlsx_dir": None,
+    "summaries_dir": None
+  }
+
+  if use_default:
+    # 기본 경로 할당
+    if "json" in output_targets:
+      paths["json_dir"] = ArtifactsPaths.JSON
+      paths["summaries_dir"] = ArtifactsPaths.SUMMARIES
+
+    if generate_charts:
+      paths["charts_dir"] = ArtifactsPaths.CHARTS
+
+    if generate_excel:
+      paths["xlsx_dir"] = ArtifactsPaths.XLSX
+  else:
+    # 사용자 지정 경로 입력
+    if "json" in output_targets:
+      j_path = questionary.path("JSON 저장 폴더:", default=str(ArtifactsPaths.JSON)).ask()
+      paths["json_dir"] = Path(j_path)
+      # 요약본은 편의상 JSON 폴더와 동일하거나 별도로 물어볼 수 있음 (여기선 생략하거나 동일하게 설정)
+      paths["summaries_dir"] = Path(j_path)
+
+    if generate_charts:
+      c_path = questionary.path("차트 저장 폴더:", default=str(ArtifactsPaths.CHARTS)).ask()
+      paths["charts_dir"] = Path(c_path)
+
+    if generate_excel:
+      x_path = questionary.path("Excel 저장 폴더:", default=str(ArtifactsPaths.XLSX)).ask()
+      paths["xlsx_dir"] = Path(x_path)
+  return paths
+
+# ====================================================
+# 사용자가 선택한 옵션을 요약해서 출력
 # ====================================================
 def print_summary(
         data_file: Path,
@@ -159,7 +209,6 @@ def print_summary(
         analysis_scope: str,
         output_targets: set[str],
 ) -> None:
-  # 사용자가 선택한 옵션을 요약해서 출력해주는 함수.
   questionary.print(
     "\n[선택한 옵션 요약]",
     style="bold",

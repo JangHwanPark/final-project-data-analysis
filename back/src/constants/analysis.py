@@ -4,8 +4,8 @@
 from __future__ import annotations
 from typing import Dict, List, Sequence, Tuple, Type
 import re
-import pandas as pd
-import json
+
+DEFAULT_NA_VALUE = "Unknown"
 
 # =================================================================
 # 알고리즘 카테고리 매핑 (Algorithm Category Mapping)

@@ -11,6 +11,7 @@ from constants.cli import (
   ENGINE_DEFAULT,
   DEFAULT_DATA_FILE,
 )
+from constants.path import ArtifactsPaths
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -40,8 +41,6 @@ def build_parser() -> argparse.ArgumentParser:
     help="인터랙티브 모드를 끄고 기본 옵션으로 실행합니다.",
   )
 
-  # 나중에 --no-charts, --no-excel 추가하면 여기서 확장
-
   return parser
 
 
@@ -49,6 +48,7 @@ def parse_arguments() -> tuple[PipelineOptions, bool]:
   parser = build_parser()
   args = parser.parse_args()
 
+  # 비대화형 모드(--no-interactive)일 때 사용할 기본 옵션 및 경로 설정
   options = PipelineOptions(
     data_file=args.data_file,
     generate_charts=True,
@@ -56,6 +56,10 @@ def parse_arguments() -> tuple[PipelineOptions, bool]:
     engine=args.engine,
     analysis_scope="full",
     output_targets={"json", "excel", "charts"},
+    json_dir=ArtifactsPaths.JSON,
+    charts_dir=ArtifactsPaths.CHARTS,
+    xlsx_dir=ArtifactsPaths.XLSX,
+    summaries_dir=ArtifactsPaths.SUMMARIES
   )
 
   interactive = not args.no_interactive
