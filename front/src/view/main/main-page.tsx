@@ -1,5 +1,8 @@
 'use client';
+import React from 'react';
+
 import type { StatsSummary } from '@/entities/summary/types';
+import { DashboardTabs, useDashboardTab } from '@/features/dashboard';
 import { DifficultyChart, buildDifficultyChartVM } from '@/features/stats/difficulty-chart';
 import { InputTypeChart, buildInputTypeChartVM } from '@/features/stats/input-type-chart';
 import { SummaryCards } from '@/features/stats/summary-cards/ui/summary-card';
@@ -23,9 +26,9 @@ export function MainPage({ stats }: Props) {
   const trendVM = buildTrendChartVM(stats);
   const inputTypeVM = buildInputTypeChartVM(stats);
   const topTagsVM = buildTopTagsVM(stats);
-
+  const { activeTab, setActiveTab } = useDashboardTab();
   return (
-    <main className="mx-auto flex-1 justify-center flex max-w-6xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
+    <main className="mx-auto flex max-w-6xl flex-1 flex-col justify-center gap-8 px-4 py-8 md:px-8 md:py-10">
       {/* 헤더 */}
       <MainHeader
         badgeText={MAIN_DASHBOARD.BADGE_TEXT}
@@ -34,6 +37,8 @@ export function MainPage({ stats }: Props) {
         metaLabel={MAIN_DASHBOARD.META_LABEL}
         metaValue={latest}
       />
+      {/* 탭 메뉴 섹션 */}
+      <DashboardTabs activeTab={activeTab} onChange={setActiveTab} />
 
       {/* 카드 + 그래프 */}
       <motion.section
