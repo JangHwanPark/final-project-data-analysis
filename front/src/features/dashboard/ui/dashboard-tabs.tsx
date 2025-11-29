@@ -18,7 +18,7 @@ interface TabItem {
 // 탭 목록 정의
 const TABS: TabItem[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'difficulty', label: 'Difficulty & Volume', icon: BarChart3 },
+  { id: 'difficulty', label: 'Difficulty & Trends', icon: BarChart3 },
   { id: 'tags', label: 'Tags & Categories', icon: Tags },
   { id: 'structure', label: 'Structure', icon: Layers },
   { id: 'raw', label: 'Raw Data', icon: Database },

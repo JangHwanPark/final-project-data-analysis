@@ -12,4 +12,4 @@ export const metadata: Metadata = {
 export default function HomeRoute() {
   const stats = mapStatsSummary(rawSummary as RawStatsSummary);
   return <MainPage stats={stats}/>
-}
+};

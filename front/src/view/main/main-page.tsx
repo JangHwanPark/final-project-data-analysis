@@ -2,18 +2,19 @@
 import React from 'react';
 
 import type { StatsSummary } from '@/entities/summary/types';
-import { DashboardTabs, useDashboardTab } from '@/features/dashboard';
-import { DifficultyChart, buildDifficultyChartVM } from '@/features/stats/difficulty-chart';
-import { InputTypeChart, buildInputTypeChartVM } from '@/features/stats/input-type-chart';
-import { SummaryCards } from '@/features/stats/summary-cards/ui/summary-card';
-import { TopTags, buildTopTagsVM } from '@/features/stats/top-tags';
-import { TrendChart } from '@/features/stats/trend-chart';
-import { buildTrendChartVM } from '@/features/stats/trend-chart/model/builders';
-import { MOTION_VARIANTS } from '@/shared/lib';
+import {
+  DashboardTabs,
+  DifficultyContent,
+  OverviewContent,
+  RawDataContent,
+  StructureContent,
+  TagsContent,
+  useDashboardTab,
+} from '@/features/dashboard';
 import { MAIN_DASHBOARD } from '@/view/main/main.constants';
 import { MainHeader } from '@/widgets';
 import { format } from 'date-fns';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 type Props = {
   stats: StatsSummary;
@@ -22,11 +23,8 @@ type Props = {
 export function MainPage({ stats }: Props) {
   const { overview } = stats;
   const latest = format(new Date(overview.latestCreatedAt), 'yyyy-MM-dd');
-  const difficultyVM = buildDifficultyChartVM(stats);
-  const trendVM = buildTrendChartVM(stats);
-  const inputTypeVM = buildInputTypeChartVM(stats);
-  const topTagsVM = buildTopTagsVM(stats);
   const { activeTab, setActiveTab } = useDashboardTab();
+
   return (
     <main className="mx-auto flex max-w-6xl flex-1 flex-col justify-center gap-8 px-4 py-8 md:px-8 md:py-10">
       {/* 헤더 */}
@@ -37,37 +35,69 @@ export function MainPage({ stats }: Props) {
         metaLabel={MAIN_DASHBOARD.META_LABEL}
         metaValue={latest}
       />
-      {/* 탭 메뉴 섹션 */}
+      {/* 탭 콘텐츠 영역 */}
       <DashboardTabs activeTab={activeTab} onChange={setActiveTab} />
 
-      {/* 카드 + 그래프 */}
-      <motion.section
-        variants={MOTION_VARIANTS.STAGGER_CONTAINER(0.06)}
-        initial="hidden"
-        animate="show"
-        className="flex flex-col gap-6"
-      >
-        {/* 상단 카드 */}
-        <motion.div variants={MOTION_VARIANTS.FADEINUP(0.02)}>
-          <SummaryCards stats={stats} />
-        </motion.div>
-        {/* 중간: 날짜별 수 + 난이도 파이 */}
-        <motion.div
-          variants={MOTION_VARIANTS.FADEINUP(0.04)}
-          className="grid gap-6 md:grid-cols-[1.5fr_1fr]"
-        >
-          <TrendChart vm={trendVM} />
-          <DifficultyChart vm={difficultyVM} />
-        </motion.div>
-        {/* 하단: 입력 타입 분포 + 상위 태그 */}
-        <motion.div
-          variants={MOTION_VARIANTS.FADEINUP(0.06)}
-          className="grid gap-6 md:grid-cols-[1.5fr_1fr]"
-        >
-          <InputTypeChart vm={inputTypeVM} />
-          <TopTags vm={topTagsVM} />
-        </motion.div>
-      </motion.section>
+      {/* 탭 콘텐츠 영역 (조건부 렌더링) */}
+      <AnimatePresence mode="wait">
+        {activeTab === '/' && (
+          <motion.div
+            key="overview"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <OverviewContent stats={stats} />
+          </motion.div>
+        )}
+
+        {/* Difficulty 탭은 metrics 데이터를 필요로 하는 구조로 가정 */}
+        {activeTab === 'difficulty' && (
+          <motion.div
+            key="difficulty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <DifficultyContent data={{ metrics: stats.metrics }} />
+          </motion.div>
+        )}
+
+        {activeTab === 'tags' && (
+          <motion.div
+            key="tags"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <TagsContent data={{ metrics: stats.metrics }} />
+          </motion.div>
+        )}
+
+        {activeTab === 'structure' && (
+          <motion.div
+            key="structure"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <StructureContent data={{ metrics: stats.metrics }} />
+          </motion.div>
+        )}
+
+        {activeTab === 'raw' && (
+          <motion.div
+            key="raw"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <RawDataContent data={stats} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Overview Content - Route: (/) */}
+      <OverviewContent stats={stats} />
     </main>
   );
 }

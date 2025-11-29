@@ -104,4 +104,7 @@ export type StatsSummary = {
   inputTypeDistribution: InputTypeDistribution;
   topTagsDistribution: TopTagsDistribution;
   duplicateTitleCount: number;
+
+  // dumy
+  metrics: RawStatsSummary['metrics'];
 };
