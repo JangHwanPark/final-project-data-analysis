@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from app_types.pipelien import AnalysisScope
 from constants.messages import (
   PIPELINE_VERSION,
@@ -21,9 +23,11 @@ from domain.service.metrics import compute_statistics
 from infrastructure.data_loader import DataLoader
 from infrastructure.logging import StepLogger, log_banner
 from infrastructure.logging.style import FG
+from infrastructure.path_manager import ArtifactType
 from presentation.exporters import JsonExporter, ExcelExporter, ChartExporter
 from .pipeline_options import PipelineOptions, default_frontend_targets
-from dataclasses import replace
+from infrastructure.path_manager import get_target_directories, ArtifactType
+
 
 # ====================================================
 # 애플리케이션 계층의 데이터 분석 파이프라인 유즈케이스.
@@ -89,15 +93,27 @@ class DataAnalysisPipeline:
   # [private helper methods] ChartExporter 사용 및 export 메서드 호출
   # ==============================================================
   def _generate_charts(self, steps: StepLogger, summary: DatasetSummary, options: PipelineOptions) -> None:
-    if not options.charts_dir:
-      self.logger.warning("차트 생성이 활성화되었으나 저장 경로(charts_dir)가 설정되지 않았습니다.")
+    # ---------------------------------------------------------
+    # 저장할 경로 리스트 확보
+    # options.charts_dir가 있으면 custom_root로 사용, 아니면 자동 로직
+    # ---------------------------------------------------------
+    target_dirs = get_target_directories(
+      ArtifactType.CHART,
+      custom_root=options.charts_dir if options.charts_dir else None
+    )
+
+    if not target_dirs:
       return
 
     steps.step(PIPELINE_STEP_GENERATE_CHARTS)
-    self.chart_exporter.export(summary, output_dir=options.charts_dir)
+
+    # 경로 반복 저장
+    for target_path in target_dirs:
+      self.logger.info(f"Generating charts to: {target_path}")
+      self.chart_exporter.export(summary, output_dir=target_path)
 
   # ==============================================================
-  # [private helper methods] Json/Excel Exporter 사용 및 options 경로 활용
+  # 아티팩트(JSON/Excel) 저장: 다중 경로 대응
   # ==============================================================
   def _write_artifacts(
           self,
@@ -106,83 +122,147 @@ class DataAnalysisPipeline:
           options: PipelineOptions
   ) -> str:
     steps.step(PIPELINE_STEP_SAVE_ARTIFACTS)
-    # ArtifactsPaths.JSON에 저장할 타겟 리스트를 생성(백업용)
-    artifacts_json_targets = []
+    # ---------------------------------------------------------
+    # JSON 저장 (Front Public, Front Shared, Back Artifacts)
+    # ---------------------------------------------------------
+    # 사용자 지정 경로가 있으면 그것만, 없으면 기본 설정된 3곳 모두 가져옴
+    json_destinations = get_target_directories(
+      ArtifactType.JSON,
+      custom_root=options.json_dir if options.json_dir else None
+    )
 
-    if options.json_dir:
-      # Frontend Targets 리스트를 가져와서 경로만 options.json_dir로 변경하여 복제
-      for target in options.frontend_json_targets:
-        artifacts_json_targets.append(replace(target, target_dir=options.json_dir))
+    if json_destinations:
+      for dest_path in json_destinations:
+        # ---------------------------------------------------------
+        # 전체 요약본(Full Summary) 저장
+        # ---------------------------------------------------------
+        self.json_exporter.export(
+          summary,
+          target_path=dest_path,
+          filename="summary.json",  # 기본 파일명
+          scope=AnalysisScope.FULL
+        )
+        # ---------------------------------------------------------
+        # 프론트엔드용 분할 파일(Subsets) 저장
+        # (프론트/백엔드 폴더 모두에 동일하게 저장하여 정합성 유지)
+        # ---------------------------------------------------------
+        for target in options.frontend_json_targets:
+          # ---------------------------------------------------------
+          # 키가 있으면: 부분 데이터 추출 저장 (예: overview.json)
+          # ---------------------------------------------------------
+          if target.keys:
+            self.json_exporter.export_subset(
+              summary,
+              target_dir=dest_path,
+              filename=target.filename,
+              keys=target.keys,
+            )
+          # ---------------------------------------------------------
+          # 키가 없으면(None): 전체 데이터 저장 (예: summary-full.json)
+          # export_subset 대신 일반 export 사용
+          # ---------------------------------------------------------
+          else:
+            self.json_exporter.export(
+              summary,
+              target_path=dest_path,
+              filename=target.filename,
+              scope=target.scope,
+            )
 
-    # JSON 저장 루프 통합 (백엔드 아티팩트 + 프론트엔드)
-    all_json_targets = artifacts_json_targets + options.frontend_json_targets
-    if all_json_targets:
-      for target in all_json_targets:
-        # 타겟 경로가 백엔드 아티팩트인지, 프론트엔드인지 구분하여 로그 출력
-        location = "Artifacts" if target.target_dir == options.json_dir else "Frontend"
-        steps.step(f"Saving [{target.scope.value}] to {location}: {target.filename}")
-
-        # 경로 생성 보장
-        target.target_dir.mkdir(parents=True, exist_ok=True)
-
-        if target.keys:
-          # Keys가 있으면: 탭별 데이터 분할 저장 (subset)
-          self.json_exporter.export_subset(
-            summary,
-            target_dir=target.target_dir,
-            filename=target.filename,
-            keys=target.keys,
-          )
-        else:
-          # Keys가 없으면: 전체 데이터 저장 (FULL/RAW Data)
-          self.json_exporter.export(
-            summary,
-            target_path=target.target_dir,
-            filename=target.filename,
-            scope=target.scope,
-          )
-
-    # Excel 저장 분리 (탭별 파일 생성)
+    # ---------------------------------------------------------
+    # Excel 저장: 탭별 파일 생성
+    # ---------------------------------------------------------
     excel_result = "Skipped"
-    if options.xlsx_dir:
-      # Excel 파일 분리 저장: overview, difficulty, tags, structure 4개의 엑셀 파일 생성
+    # Excel 저장 경로 리스트 확보
+    excel_destinations = get_target_directories(
+      ArtifactType.EXCEL,
+      custom_root=options.xlsx_dir if options.xlsx_dir else None
+    )
+    if excel_destinations:
       excel_targets = default_frontend_targets(AnalysisScope.FULL)
 
       def excel_progress_callback(current, total, message):
         steps.progress(current, total, message, channel="Excel")
 
-      for idx, target in enumerate(excel_targets):
-        # 엑셀 파일명은 JSON 파일명과 동일하게 사용(예: overview.xlsx)
-        filename = f"{target.filename}.xlsx"
-        filepath = options.xlsx_dir / filename
-        steps.progress(idx + 1, len(excel_targets), f"Writing {filename}")
-        # TODO
-        # ExcelExporter는 JSON처럼 subset 추출 로직이 없으므로,
-        # 현재는 모든 엑셀 파일에 전체 Summary를 저장하는 방식으로 구현합니다.
-        # (나중에 ExcelExporter에 subset 추출 로직을 추가해야 함)
-        # 콜백은 ExcelExporter 내부에서 관리 필요
-        self.excel_exporter.export(summary, filepath=filepath, progress_callback=excel_progress_callback)
-        # 마지막 경로만 저장
-        excel_result = str(options.xlsx_dir)
+      # 각 저장 목적지별로 반복
+      for dest_path in excel_destinations:
+        for idx, target in enumerate(excel_targets):
+          filename = f"{target.filename}.xlsx"
+          filepath = dest_path / filename
+
+          # 로그는 한 번만 출력하거나 경로 포함해서 출력
+          steps.progress(idx + 1, len(excel_targets), f"Writing {filename} to {dest_path.name}")
+
+          self.excel_exporter.export(
+            summary,
+            filepath=filepath,
+            progress_callback=excel_progress_callback
+          )
+
+        # 마지막 저장 경로를 결과로 반환 (로깅용)
+        excel_result = str(dest_path)
 
     return excel_result
 
+  # ==============================================================
+  # 폴더 내부 파일 목록을 출력하는 헬퍼 메서드
+  # ==============================================================
+  def _print_dir_contents(self, directory: Path, label: str) -> None:
+    if not directory.exists():
+      return
+
+    # 해당 폴더의 파일들만 가져오기 (폴더 제외)
+    files = [f for f in directory.iterdir() if f.is_file() and not f.name.startswith('.')]
+
+    if not files:
+      return
+
+    self.logger.info(f"📦 [{label}] Saved to: {directory}")
+    for f in sorted(files):
+      # 파일 크기 계산 (KB 단위)
+      size_kb = f.stat().st_size / 1024
+      self.logger.info(f"   └─ 📄 {f.name} ({size_kb:.1f} KB)")
+    print("")  # 공백 줄 추가
+
+  # ==============================================================
+  # 완료 로그 메서드 (파일 목록 출력 기능)
+  # ==============================================================
   def _log_completion(self, excel_path: str, options: PipelineOptions) -> None:
     log_banner(
       PIPELINE_TITLE_COMPLETE,
       color=FG.GREEN,
       line_color=FG.GREEN,
     )
+    # ---------------------------------------------------------
+    # JSON 파일 목록 출력
+    # 저장된 위치들을 다시 계산해서 가져옴
+    # ---------------------------------------------------------
+    json_dirs = get_target_directories(
+      ArtifactType.JSON,
+      custom_root=options.json_dir
+    )
+    for path in json_dirs:
+      self._print_dir_contents(path, "JSON Artifacts")
+    # ---------------------------------------------------------
+    # 차트 파일 목록 출력
+    # ---------------------------------------------------------
+    if options.charts_dir or options.frontend_json_targets:  # 차트 생성 조건
+      # 차트 경로는 options에 있거나 기본 경로
+      chart_dirs = get_target_directories(
+        ArtifactType.CHART,
+        custom_root=options.charts_dir
+      )
+      for path in chart_dirs:
+        # 차트 폴더가 실제로 존재하고 파일이 있을 때만 출력
+        self._print_dir_contents(path, "Charts")
+    # ---------------------------------------------------------
+    # 엑셀 파일 목록 출력
+    # ---------------------------------------------------------
+    excel_dirs = get_target_directories(
+      ArtifactType.EXCEL,
+      custom_root=options.xlsx_dir
+    )
+    for path in excel_dirs:
+      self._print_dir_contents(path, "Excel Report")
 
-    if options.json_dir:
-      # JSON 디렉토리에는 5개의 파일이 저장됨을 로깅
-      self.logger.info(PIPELINE_LOG_SAVED.format(label="JSON", path=options.json_dir))
-
-    if options.charts_dir and options.charts_dir:
-      self.logger.info(PIPELINE_LOG_SAVED.format(label="Charts", path=options.charts_dir))
-
-    if excel_path != "Skipped":
-      # 엑셀도 분할되어 저장되었음을 로깅
-      self.logger.info(PIPELINE_LOG_SAVED.format(label="Excel Report", path=excel_path))
-
-    log_banner(PIPELINE_TITLE_FINISHED, color=FG.YELLOW, line_color=FG.YELLOW)
+  log_banner(PIPELINE_TITLE_FINISHED, color=FG.YELLOW, line_color=FG.YELLOW)

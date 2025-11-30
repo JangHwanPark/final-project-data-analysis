@@ -13,7 +13,7 @@ except (ImportError, AssertionError):
     """윈도우 콘솔 버퍼 관련 예외 더미 클래스 (비윈도우 환경용)."""
     pass
 
-from typing import Any, Dict, Set, List, Tuple
+from typing import Any, Dict, Set, List, Tuple, Optional
 from constants.path import DataPaths
 from infrastructure.logging import get_logger
 
@@ -174,30 +174,28 @@ def ask_artifact_paths(output_targets: Set[OutputTarget], generate_charts: bool,
     default=True
   ).ask()
 
-  paths = {
+  paths: Dict[str, Optional[Path]] = {
     "json_dir": None,
     "charts_dir": None,
     "xlsx_dir": None,
     "summaries_dir": None
   }
 
+  # ---------------------------------------------------------
+  # 기본 경로를 쓴다고 하면, 여기서 구체적인 경로를 지정하지 않고 None으로 둠
+  # 그러면 pipeline.py 내부에서 get_target_directories()를 호출하여
+  # 환경(Dev/Exe)에 맞는 다중 경로를 자동으로 가져옴
+  # ---------------------------------------------------------
   if use_default:
-    # 기본 경로 할당
-    if "json" in output_targets:
-      paths["json_dir"] = ArtifactsPaths.JSON
-      paths["summaries_dir"] = ArtifactsPaths.SUMMARIES
-
-    if generate_charts:
-      paths["charts_dir"] = ArtifactsPaths.CHARTS
-
-    if generate_excel:
-      paths["xlsx_dir"] = ArtifactsPaths.XLSX
+    pass
+  # ---------------------------------------------------------
+  # 사용자 지정 경로 입력 (단일 폴더 지정)
+  # 사용자가 직접 입력한 경우에는 그 폴더 하나에만 저장됩니다.
+  # ---------------------------------------------------------
   else:
-    # 사용자 지정 경로 입력
     if "json" in output_targets:
-      j_path = questionary.path("JSON 저장 폴더:", default=str(ArtifactsPaths.JSON)).ask()
+      j_path = questionary.path("JSON 저장 루트 폴더:", default=str(ArtifactsPaths.JSON)).ask()
       paths["json_dir"] = Path(j_path)
-      # 요약본은 편의상 JSON 폴더와 동일하거나 별도로 물어볼 수 있음 (여기선 생략하거나 동일하게 설정)
       paths["summaries_dir"] = Path(j_path)
 
     if generate_charts:
@@ -207,6 +205,7 @@ def ask_artifact_paths(output_targets: Set[OutputTarget], generate_charts: bool,
     if generate_excel:
       x_path = questionary.path("Excel 저장 폴더:", default=str(ArtifactsPaths.XLSX)).ask()
       paths["xlsx_dir"] = Path(x_path)
+
   return paths
 
 
@@ -273,14 +272,34 @@ def ask_user_with_questionary() -> PipelineOptions:
   data_file = ask_data_file(engine)
   analysis_scope = ask_analysis_scope()
   output_targets = ask_output_targets()
-
-  # 저장 경로 확인
-  json_dir = ArtifactsPaths.JSON
-  charts_dir = ArtifactsPaths.CHARTS
-  xlsx_dir = ArtifactsPaths.XLSX
+  # ---------------------------------------------------------
+  # [중복 질문] 차트/엑셀 생성 여부 판단
+  # (output_targets에 포함되어 있고 + 사용자에게 추가 질문)
+  # ---------------------------------------------------------
+  # gen_charts = False
+  # if ask_generate_charts_from_targets(output_targets):
+  #   gen_charts = ask_generate_charts()
+  #
+  # gen_excel = False
+  # if ask_generate_excel_from_targets(output_targets):
+  #   gen_excel = ask_generate_excel()
+  # ---------------------------------------------------------
+  # 경로 질문 함수 호출!
+  # 사용자가 이미 위에서 체크박스로 선택했으니, 포함 여부만 확인
+  # ---------------------------------------------------------
+  gen_charts = "charts" in output_targets
+  gen_excel = "excel" in output_targets
+  paths = ask_artifact_paths(output_targets, gen_charts, gen_excel)
+  # ---------------------------------------------------------
+  # 결과 변수 할당 (None이 들어올 수 있음)
+  # ---------------------------------------------------------
+  json_dir = paths["json_dir"]
+  charts_dir = paths["charts_dir"]
+  xlsx_dir = paths["xlsx_dir"]
   frontend_targets = default_frontend_targets(analysis_scope=analysis_scope)
-
+  # ---------------------------------------------------------
   # 최종 요약 출력
+  # ---------------------------------------------------------
   print_summary(
     data_file=data_file,
     engine=engine,
@@ -291,11 +310,13 @@ def ask_user_with_questionary() -> PipelineOptions:
     xlsx_dir=xlsx_dir,
     frontend_json_targets=frontend_targets,
   )
-
+  # ---------------------------------------------------------
   # 실행 여부 최종 확인
+  # ---------------------------------------------------------
   confirm_run()
-
+  # ---------------------------------------------------------
   # PipelineOptions 인스턴스 생성 후 반환
+  # ---------------------------------------------------------
   return PipelineOptions(
     data_file=data_file,
     engine=engine,
