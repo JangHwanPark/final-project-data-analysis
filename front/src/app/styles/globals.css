@@ -1,3 +1,9 @@
+/* 레이어 우선순위 정의 (mantine을 가장 낮게 설정) */
+@layer mantine, base, components, utilities;
+
+/* Mantine 기본 변수 및 유틸리티(필수) */
+@import '@mantine/core/styles.css' layer(mantine);
+/* Tailwind */
 @import "tailwindcss";
 
 :root {

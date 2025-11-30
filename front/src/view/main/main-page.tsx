@@ -57,7 +57,7 @@ export function MainPage({ stats }: Props) {
   const HEADER_CONFIG = MAIN_DASHBOARD.HEADERS[activeTab];
 
   return (
-    <main className="mx-auto flex w-6xl max-w-6xl flex-1 flex-col justify-center gap-8 px-4 py-8 md:px-8 md:py-10">
+    <main className="mx-auto flex w-full mf:w-4xl xl:w-6xl max-w-6xl flex-1 flex-col justify-center gap-8 px-4 py-8 md:px-8 md:py-10">
       {/* 헤더 */}
       <MainHeader
         badgeText={MAIN_DASHBOARD.COMMON.BADGE_TEXT}

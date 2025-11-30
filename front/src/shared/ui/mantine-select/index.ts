@@ -1,0 +1,1 @@
+export {MantineSelect} from '@/shared/ui/mantine-select/mantine-select';

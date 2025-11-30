@@ -3,6 +3,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
+import { GlobalProvider } from '@/app/providers';
+// import '@mantine/core/styles.css';
 import '@/app/styles/globals.css';
 import { Footer, GlobalNavbar } from '@/widgets';
 
@@ -25,8 +27,8 @@ export const metadata: Metadata = {
   icons: {
     icon: '/ja_bg_favicon.png',
     shortcut: '/ja_bg_favicon.png',
-    apple: '/ja_bg_favicon.png'
-  }
+    apple: '/ja_bg_favicon.png',
+  },
 };
 
 export default function RootLayout({
@@ -39,7 +41,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="flex min-h-screen flex-col">
           <GlobalNavbar />
-          {children}
+          <GlobalProvider>{children}</GlobalProvider>
           <Footer />
         </div>
       </body>
