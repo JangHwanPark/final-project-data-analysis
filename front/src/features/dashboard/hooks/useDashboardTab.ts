@@ -1,5 +1,6 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { TabId } from '@/features/dashboard/ui/DashboardTabs';
+import { DashboardTabKey } from '@/features/dashboard';
+import { TABS } from '@/features/dashboard/constants';
 
 export const useDashboardTab = ()  => {
   const router = useRouter();
@@ -7,10 +8,11 @@ export const useDashboardTab = ()  => {
   const searchParams = useSearchParams();
 
   // URL에서 탭 정보 가져오기 (기본값: overview)
-  const activeTab = (searchParams.get('tab') as TabId) || 'overview';
+  const rawTab = searchParams.get('tab');
+  const activeTab: DashboardTabKey = TABS.IDS.includes(rawTab as DashboardTabKey) ? (rawTab as DashboardTabKey) : 'overview';
 
   // 탭 변경 핸들러
-  const setActiveTab = (tab: TabId) => {
+  const setActiveTab = (tab: DashboardTabKey) => {
     const params = new URLSearchParams(searchParams.toString());
     // params.set('tab', tab);
 

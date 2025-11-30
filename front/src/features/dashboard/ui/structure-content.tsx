@@ -69,7 +69,7 @@ export const StructureContent = ({ data }: Props) => {
         className="rounded-3xl border border-white/10 bg-zinc-900/30 p-6"
       >
         <div className="mb-6">
-          <h3 className="text-lg font-bold text-white">📝 Description Length Distribution</h3>
+          <h3 className="text-lg font-bold text-white">Description Length Distribution</h3>
           <p className="text-xs text-zinc-500">문제 설명의 글자 수 구간별 분포입니다.</p>
         </div>
         <div className="h-[250px] w-full">
@@ -109,7 +109,7 @@ export const StructureContent = ({ data }: Props) => {
           variants={MOTION.FADEINUP(0.04)}
           className="rounded-3xl border border-white/10 bg-zinc-900/30 p-6"
         >
-          <h3 className="mb-4 text-lg font-bold text-white">⚠️ Constraints Count</h3>
+          <h3 className="mb-4 text-lg font-bold text-white">Constraints Count</h3>
           <p className="mb-4 text-xs text-zinc-500">문제당 포함된 제약조건의 개수입니다.</p>
           <div className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -135,7 +135,7 @@ export const StructureContent = ({ data }: Props) => {
           variants={MOTION.FADEINUP(0.06)}
           className="rounded-3xl border border-white/10 bg-zinc-900/30 p-6"
         >
-          <h3 className="mb-4 text-lg font-bold text-white">💡 Example Cases Count</h3>
+          <h3 className="mb-4 text-lg font-bold text-white">Example Cases Count</h3>
           <p className="mb-4 text-xs text-zinc-500">문제 지문에 제공된 예제 케이스의 개수입니다.</p>
           <div className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">

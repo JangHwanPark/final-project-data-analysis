@@ -86,7 +86,7 @@ export const DifficultyContent = ({ data }: Props) => {
         variants={MOTION_VARIANTS.FADEINUP(0.04)}
         className="rounded-3xl border border-white/10 bg-zinc-900/30 p-6"
       >
-        <h3 className="mb-6 text-lg font-bold text-white">📅 Daily Difficulty Volume</h3>
+        <h3 className="mb-6 text-lg font-bold text-white">Daily Difficulty Volume</h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={trendData}>
@@ -116,7 +116,7 @@ export const DifficultyContent = ({ data }: Props) => {
         variants={MOTION_VARIANTS.FADEINUP(0.06)}
         className="rounded-3xl border border-white/10 bg-zinc-900/30 p-6"
       >
-        <h3 className="mb-6 text-lg font-bold text-white">🧩 Complexity Metrics by Difficulty</h3>
+        <h3 className="mb-6 text-lg font-bold text-white">Complexity Metrics by Difficulty</h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartComplexityData}>

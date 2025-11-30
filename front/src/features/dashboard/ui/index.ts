@@ -1,5 +1,5 @@
 export { DashboardTabs } from '@/features/dashboard/ui/dashboard-tabs';
-export type { TabId } from '@/features/dashboard/ui/dashboard-tabs';
+export type { DashboardTabKey } from '@/features/dashboard/types';
 
 // Contents
 export { OverviewContent } from '@/features/dashboard/ui/overview-content';

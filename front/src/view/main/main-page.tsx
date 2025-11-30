@@ -53,14 +53,17 @@ export function MainPage({ stats }: Props) {
     metrics: stats.metrics,
   });
 
+  // 헤더 매핑
+  const HEADER_CONFIG = MAIN_DASHBOARD.HEADERS[activeTab];
+
   return (
     <main className="mx-auto flex w-6xl max-w-6xl flex-1 flex-col justify-center gap-8 px-4 py-8 md:px-8 md:py-10">
       {/* 헤더 */}
       <MainHeader
-        badgeText={MAIN_DASHBOARD.BADGE_TEXT}
-        title={MAIN_DASHBOARD.TITLE}
-        description={MAIN_DASHBOARD.DESCRIPTION}
-        metaLabel={MAIN_DASHBOARD.META_LABEL}
+        badgeText={MAIN_DASHBOARD.COMMON.BADGE_TEXT}
+        metaLabel={MAIN_DASHBOARD.COMMON.META_LABEL}
+        title={HEADER_CONFIG.TITLE}
+        description={HEADER_CONFIG.DESCRIPTION}
         metaValue={latest}
       />
       {/* 탭 콘텐츠 영역 */}

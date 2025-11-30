@@ -1,0 +1,1 @@
+export { TABS } from '@/features/dashboard/constants/dashboard-tabs';

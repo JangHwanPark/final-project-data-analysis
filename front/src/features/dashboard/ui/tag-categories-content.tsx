@@ -62,7 +62,7 @@ export const TagsContent = ({ data }: Props) => {
         variants={MOTION.FADEINUP(0.02)}
         className="col-span-1 rounded-3xl border border-white/10 bg-zinc-900/30 p-6 md:col-span-2"
       >
-        <h3 className="mb-2 text-lg font-bold text-white">🔥 Top 10 Frequent Tags</h3>
+        <h3 className="mb-2 text-lg font-bold text-white">Top 10 Frequent Tags</h3>
         <p className="mb-6 text-sm text-zinc-400">가장 자주 등장하는 문제 유형 상위 10개입니다.</p>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -89,7 +89,7 @@ export const TagsContent = ({ data }: Props) => {
         variants={MOTION.FADEINUP(0.04)}
         className="rounded-3xl border border-white/10 bg-zinc-900/30 p-6"
       >
-        <h3 className="mb-4 text-lg font-bold text-white">🗂️ Algorithm Categories</h3>
+        <h3 className="mb-4 text-lg font-bold text-white">Algorithm Categories</h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
