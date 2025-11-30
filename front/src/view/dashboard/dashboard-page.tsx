@@ -6,10 +6,10 @@ import type {
   DashboardStat,
   ActivityItem,
   SummaryRow,
-} from '@/src/shared/constants/dashboard';
-import { MOTION_VARIANTS } from '@/src/shared/lib/variants';
-import { format } from '@/src/shared/lib/format';
-import { cn } from '@/src/shared/lib/cn';
+} from '@/shared/constants/dashboard';
+import { MOTION_VARIANTS } from '@/shared/lib/variants';
+import { FORMAT } from '@/shared/lib/format';
+import { cn } from '@/shared/lib/cn';
 
 type DashboardPageProps = {
   stats: DashboardStat[];
@@ -111,7 +111,7 @@ export const DashboardPage = ({
                 >
                   <div className="flex-1">
                     <p className="font-medium">
-                      {format.truncate(row.name, 22)}
+                      {FORMAT.truncate(row.name, 22)}
                     </p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       총 {row.total}건 실행
@@ -125,7 +125,7 @@ export const DashboardPage = ({
                       />
                     </div>
                     <span className="w-12 text-right text-xs font-medium text-zinc-700 dark:text-zinc-200">
-                      {format.percent(row.successRate, 0)}
+                      {FORMAT.percent(row.successRate, 0)}
                     </span>
                   </div>
                 </div>

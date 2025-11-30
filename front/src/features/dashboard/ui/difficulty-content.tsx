@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import { DifficultyKey } from '@/entities/dashboard';
+import type { DifficultyStats } from '@/entities/difficulty';
 import { MOTION_VARIANTS } from '@/shared/lib';
 import { motion } from 'framer-motion';
 import {
@@ -17,50 +19,28 @@ import {
   YAxis,
 } from 'recharts';
 
-// 백엔드 데이터 타입 (임시 정의, entities에 있다면 import)
-interface DifficultyStats {
-  metrics: {
-    difficulty_distribution: {
-      counts: Record<string, number>;
-      percentages: Record<string, number>;
-    };
-    difficulty_over_time: Array<{ date: string; Easy: number; Medium: number; Hard: number }>;
-    avg_description_length_by_difficulty: Record<string, number>;
-    avg_test_cases_by_difficulty: Record<string, number>;
-  };
-}
-
 interface Props {
   data: DifficultyStats;
 }
 
 export const DifficultyContent = ({ data }: Props) => {
-  // const { metrics } = data;
-  const metrics = data?.metrics;
+  const { metrics, complexityData, difficultyDistribution, difficultyOverTime } = data;
 
-  // 차트용 데이터 변환 (Complexity Chart)
-  const complexityData = [
-    {
-      name: 'Easy',
-      descLength: metrics.avg_description_length_by_difficulty?.Easy || 0,
-      testCases: metrics.avg_test_cases_by_difficulty?.Easy || 0,
-    },
-    {
-      name: 'Medium',
-      descLength: metrics.avg_description_length_by_difficulty?.Medium || 0,
-      testCases: metrics.avg_test_cases_by_difficulty?.Medium || 0,
-    },
-    {
-      name: 'Hard',
-      descLength: metrics.avg_description_length_by_difficulty?.Hard || 0,
-      testCases: metrics.avg_test_cases_by_difficulty?.Hard || 0,
-    },
-  ];
+  // 데이터가 없을 경우를 대비한 안전 장치 (컴포넌트가 최소한의 방어)
+  if (!metrics || !complexityData || !difficultyDistribution || !difficultyOverTime) {
+    return (
+      <div className="flex h-[400px] w-full items-center justify-center rounded-3xl border border-white/10 bg-zinc-900/30 text-zinc-500">
+        데이터를 불러오는 중이거나 없습니다. (매퍼에서 데이터가 생성되지 않았을 수 있습니다.)
+      </div>
+    );
+  }
 
   // DUMP: 차트 렌더링에 필요한 추가 데이터 안전 추출
-  const diffCounts = metrics.difficulty_distribution?.counts || {};
-  const diffPercents = metrics.difficulty_distribution?.percentages || {};
-  const trendData = metrics.difficulty_over_time || [];
+  const diffCounts = difficultyDistribution.counts;
+  const diffPercents = difficultyDistribution.percentages;
+  const trendData = difficultyOverTime;
+  const chartComplexityData = complexityData;
+  const difficultyLevels: DifficultyKey[] = ['Easy', 'Medium', 'Hard'];
 
   return (
     <motion.section
@@ -74,7 +54,7 @@ export const DifficultyContent = ({ data }: Props) => {
         variants={MOTION_VARIANTS.FADEINUP(0.02)}
         className="grid grid-cols-1 gap-4 md:grid-cols-3"
       >
-        {['Easy', 'Medium', 'Hard'].map((level) => (
+        {difficultyLevels.map((level) => (
           <div
             key={level}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 p-6 backdrop-blur-sm"
@@ -91,12 +71,10 @@ export const DifficultyContent = ({ data }: Props) => {
             <h3 className="text-sm font-medium text-zinc-400">{level} Questions</h3>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-3xl font-bold text-white">
-                {/*{metrics.difficulty_distribution.counts[level]}*/}
-                {diffCounts[level] || 0}
+                {diffCounts[level as DifficultyKey] || 0}
               </span>
               <span className="text-sm text-zinc-500">
-                {/*({metrics.difficulty_distribution.percentages[level]}%)*/}
-                ({diffPercents[level] || 0}%)
+                ({diffPercents[level as DifficultyKey] || 0}%)
               </span>
             </div>
           </div>
@@ -111,7 +89,7 @@ export const DifficultyContent = ({ data }: Props) => {
         <h3 className="mb-6 text-lg font-bold text-white">📅 Daily Difficulty Volume</h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={metrics.difficulty_over_time}>
+            <BarChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
               <XAxis dataKey="date" stroke="#666" fontSize={12} tickMargin={10} />
               <YAxis stroke="#666" fontSize={12} />
@@ -141,7 +119,7 @@ export const DifficultyContent = ({ data }: Props) => {
         <h3 className="mb-6 text-lg font-bold text-white">🧩 Complexity Metrics by Difficulty</h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={complexityData}>
+            <ComposedChart data={chartComplexityData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
               <XAxis dataKey="name" stroke="#666" fontSize={12} />
 
@@ -199,4 +177,4 @@ export const DifficultyContent = ({ data }: Props) => {
       </motion.div>
     </motion.section>
   );
-}
+};

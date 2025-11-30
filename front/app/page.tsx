@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import rawSummary from '@/shared/data/summary.json';
 import { MainPage } from '@/view/main';
 import type {RawStatsSummary} from "@/entities/summary/types";
-import { mapStatsSummary } from '@/entities/summary/mapper';
+import { summary } from '@/entities/summary';
 
 export const metadata: Metadata = {
   title: '대시보드 | 프로젝트 통계',
@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomeRoute() {
-  const stats = mapStatsSummary(rawSummary as RawStatsSummary);
+  const stats = summary.mapper.toStats(rawSummary as RawStatsSummary);
   return <MainPage stats={stats}/>
 };
