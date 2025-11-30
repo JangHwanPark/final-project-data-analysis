@@ -1,8 +1,9 @@
 from __future__ import annotations
-
-from infrastructure.runtime.venv import ensure_venv
-
-ensure_venv(module_to_run="app.main")
+import sys
+# PyInstaller로 빌드된 상태(frozen)가 아닐 때만 가상환경 체크를 수행
+if not getattr(sys, 'frozen', False):
+  from infrastructure.runtime.venv import ensure_venv
+  ensure_venv(module_to_run="app.main")
 
 from pathlib import Path
 from infrastructure.data_loader import DataLoader
