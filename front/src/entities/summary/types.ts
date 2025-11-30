@@ -1,3 +1,5 @@
+// 도메인 모델 그룹
+// 프론트엔드 애플리케이션의 뷰(View)와 비즈니스 로직에 최적화된 형태를 정의
 export type RawStatsSummary = {
   overview: {
     total_questions: number;

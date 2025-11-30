@@ -2,10 +2,9 @@ import type {
   RawStatsSummary,
   StatsSummary,
   DifficultyDistribution,
-  DifficultyKey,
 } from './types';
 
-export const mapDifficultyDistribution = (
+const toDifficulty = (
     src: RawStatsSummary['metrics']['difficulty_distribution'],
 ): DifficultyDistribution => ({
   counts: {
@@ -20,7 +19,7 @@ export const mapDifficultyDistribution = (
   },
 });
 
-export const mapStatsSummary = (raw: RawStatsSummary): StatsSummary => {
+const toStats = (raw: RawStatsSummary): StatsSummary => {
   const { overview, metrics } = raw;
 
   return {
@@ -31,18 +30,24 @@ export const mapStatsSummary = (raw: RawStatsSummary): StatsSummary => {
       latestCreatedAt: overview.latest_created_at,
       daysSpan: overview.days_span,
     },
-    difficultyDistribution: mapDifficultyDistribution(
+    metrics: metrics,
+    difficultyDistribution: toDifficulty(
         metrics.difficulty_distribution,
     ),
     problemsPerDay: metrics.problems_per_day,
     difficultyOverTime: metrics.difficulty_over_time.map((item) => ({
       date: item.date,
-      Easy: item.Easy,
-      Medium: item.Medium,
-      Hard: item.Hard,
+      Easy: item.Easy || 0,
+      Medium: item.Medium || 0,
+      Hard: item.Hard || 0,
     })),
     inputTypeDistribution: metrics.input_type_distribution,
     topTagsDistribution: metrics.top_tags_distribution,
     duplicateTitleCount: metrics.duplicate_title_count,
   };
 };
+
+export const mapper = {
+  toStats,
+  toDifficulty,
+}
