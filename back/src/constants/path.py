@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Final, List
+from typing import Final
 
 # =================================================================
 # 프로젝트 ROOT 폴더
@@ -49,6 +49,13 @@ class FrontendPaths:
 # artifacts 디렉토리를 자동으로 생성하는 유틸
 # =================================================================
 def ensure_directories() -> None:
-  ArtifactsPaths.ROOT.mkdir(parents=True, exist_ok=True)
-  ArtifactsPaths.SUMMARIES.mkdir(parents=True, exist_ok=True)
-  ArtifactsPaths.CHARTS.mkdir(parents=True, exist_ok=True)
+  # 파이프라인을 실행하기 전에 모든 출력 디렉토리가 있는지 확인
+  dirs_to_ensure = [
+    ArtifactsPaths.ROOT,
+    ArtifactsPaths.JSON,
+    ArtifactsPaths.CHARTS,
+    ArtifactsPaths.XLSX,
+    FrontendPaths.SHARED_DATA_DIR,
+  ]
+  for d in dirs_to_ensure:
+    d.mkdir(parents=True, exist_ok=True)

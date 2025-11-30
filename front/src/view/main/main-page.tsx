@@ -24,7 +24,7 @@ export function MainPage({ stats }: Props) {
   const { overview } = stats;
   const latest = format(new Date(overview.latestCreatedAt), 'yyyy-MM-dd');
   const { activeTab, setActiveTab } = useDashboardTab();
-
+  console.log(activeTab);
   return (
     <main className="mx-auto flex max-w-6xl flex-1 flex-col justify-center gap-8 px-4 py-8 md:px-8 md:py-10">
       {/* 헤더 */}
@@ -40,7 +40,7 @@ export function MainPage({ stats }: Props) {
 
       {/* 탭 콘텐츠 영역 (조건부 렌더링) */}
       <AnimatePresence mode="wait">
-        {activeTab === '/' && (
+        {activeTab === 'overview' && (
           <motion.div
             key="overview"
             initial={{ opacity: 0 }}
@@ -96,8 +96,6 @@ export function MainPage({ stats }: Props) {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Overview Content - Route: (/) */}
-      <OverviewContent stats={stats} />
     </main>
   );
 }

@@ -1,0 +1,69 @@
+{
+    "summary_info": {
+        "generated_at": "2025-11-30T09:21:12.114091"
+    },
+    "metrics": {
+        "top_tags_distribution": {
+            "array": 377,
+            "tree": 120,
+            "string": 98,
+            "graph": 71,
+            "uncategorized": 50,
+            "matrix": 35,
+            "binary_search": 27,
+            "math": 17,
+            "queue": 8,
+            "interval": 6
+        },
+        "algorithm_category_distribution": {
+            "counts": {
+                "Uncategorized": 301,
+                "Tree": 120,
+                "String": 97,
+                "Graph": 56,
+                "Binary Search": 10,
+                "Math": 8,
+                "Interval": 6,
+                "Queue": 5,
+                "Sliding Window": 5,
+                "Greedy": 3,
+                "DP": 3,
+                "Stack": 1,
+                "Heap": 1
+            },
+            "percentages": {
+                "Uncategorized": 48.86,
+                "Tree": 19.48,
+                "String": 15.75,
+                "Graph": 9.09,
+                "Binary Search": 1.62,
+                "Math": 1.3,
+                "Interval": 0.97,
+                "Queue": 0.81,
+                "Sliding Window": 0.81,
+                "Greedy": 0.49,
+                "DP": 0.49,
+                "Stack": 0.16,
+                "Heap": 0.16
+            }
+        },
+        "input_type_distribution": {
+            "counts": {
+                "Array": 377,
+                "String": 78,
+                "Mixed/Other": 67,
+                "Tree": 57,
+                "Matrix": 32,
+                "Graph": 5
+            },
+            "percentages": {
+                "Array": 61.2,
+                "String": 12.66,
+                "Mixed/Other": 10.88,
+                "Tree": 9.25,
+                "Matrix": 5.19,
+                "Graph": 0.81
+            }
+        }
+    }
+}

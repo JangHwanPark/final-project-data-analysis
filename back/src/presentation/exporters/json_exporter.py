@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import json
 from pathlib import Path
 from typing import Optional, Any
@@ -33,15 +34,37 @@ class JsonExporter:
     :param scope: 데이터 저장 범위 (FULL: 전체, BASIC: 요약, CUSTOM: 커스텀). 기본값은 FULL.
     """
     # 저장할 전체 경로 계산
-    final_path = self._resolve_path(target_path, filename)
+    # final_path = self._resolve_path(target_path, filename)
     # 데이터 직렬화 준비 (도메인 객체 -> dict)
-    full_data = self._prepare_data(summary)
+    # full_data = self._prepare_data(summary)
     # 스코프에 따른 데이터 필터링 수행
-    data_to_write = self._filter_data(full_data, scope)
+    # data_to_write = self._filter_data(full_data, scope)
+    # DatasetSummary 객체를 딕셔너리로 변환
+    data = summary.to_dict()
+    # 전체 경로 생성
+    filepath = target_path / filename
+    logger.info(f"Attempting to write full summary to: {filepath}")
+    return self._write_to_file(data, filepath)
 
-    # 실제 파일 쓰기
-    # return self._write_to_file(data_to_write, final_path)
-    return self._write_to_file(data_to_write, final_path)
+  # ====================================================
+  # 부분 저장용 메서드 (Config에 정의된 키만 뽑아서 저장)
+  # DatasetSummary에서 특정 키(metrics, overview)만 추출하여 JSON으로 저장
+  # ====================================================
+  def export_subset(
+          self,
+          summary: DatasetSummary,
+          target_dir: Path,
+          filename: str,
+          keys: list[str]
+  ) -> Optional[Path]:
+    # 저장할 경로 계산
+    final_path = target_dir / filename
+
+    # 필요한 데이터만 뽑아내기 (Filtering)
+    subset_data = self._extract_subset_data(summary, keys)
+
+    # 파일 쓰기 (기존 메서드 재사용)
+    return self._write_to_file(subset_data, final_path)
 
   # 필터링 헬퍼 메서드
   def _filter_data(self, data: dict, scope: AnalysisScope) -> dict:
@@ -118,29 +141,10 @@ class JsonExporter:
       logger.info(f"SUCCESS: JSON exported to {filepath}")
       return filepath
 
-    except Exception:
-      logger.exception(f"ERROR: Failed to export JSON to {filepath}")
+    except Exception as e:
+      logger.error(f"ERROR: Failed to export JSON to {filepath}.")
+      logger.error(f"Error: {e}")
       return None
-
-  # ====================================================
-  # 부분 저장용 메서드 (Config에 정의된 키만 뽑아서 저장)
-  # DatasetSummary에서 특정 키(metrics, overview)만 추출하여 JSON으로 저장
-  # ====================================================
-  def export_subset(
-          self,
-          summary: DatasetSummary,
-          target_dir: Path,
-          filename: str,
-          keys: list[str]
-  ) -> Optional[Path]:
-    # 저장할 경로 계산
-    final_path = target_dir / filename
-
-    # 필요한 데이터만 뽑아내기 (Filtering)
-    subset_data = self._extract_subset_data(summary, keys)
-
-    # 파일 쓰기 (기존 메서드 재사용)
-    return self._write_to_file(subset_data, final_path)
 
   # ====================================================
   # Private Helper: 데이터 필터링 로직

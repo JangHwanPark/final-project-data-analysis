@@ -1,0 +1,31 @@
+{
+    "summary_info": {
+        "generated_at": "2025-11-30T09:21:12.114091"
+    },
+    "metrics": {
+        "description_length_bucket_distribution": {
+            "0-200": 218,
+            "201-400": 284,
+            "401-600": 91,
+            "601+": 23
+        },
+        "constraints_count_distribution": {
+            "0": 0,
+            "1": 0,
+            "2-3": 198,
+            "4+": 418
+        },
+        "example_count_distribution": {
+            "0": 0,
+            "1": 0,
+            "2": 608,
+            "3+": 8
+        },
+        "test_case_count_distribution": {
+            "0-1": 0,
+            "2-3": 0,
+            "4-6": 556,
+            "7+": 60
+        }
+    }
+}

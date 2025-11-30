@@ -1,0 +1,43 @@
+{
+    "summary_info": {
+        "generated_at": "2025-11-30T09:21:12.114091"
+    },
+    "metrics": {
+        "difficulty_distribution": {
+            "counts": {
+                "Hard": 240,
+                "Medium": 193,
+                "Easy": 183
+            },
+            "percentages": {
+                "Hard": 38.96,
+                "Medium": 31.33,
+                "Easy": 29.71
+            }
+        },
+        "difficulty_over_time": [
+            {
+                "date": "2025-03-16",
+                "Easy": 135,
+                "Hard": 191,
+                "Medium": 148
+            },
+            {
+                "date": "2025-03-18",
+                "Easy": 48,
+                "Hard": 49,
+                "Medium": 45
+            }
+        ],
+        "avg_description_length_by_difficulty": {
+            "Easy": 204.21,
+            "Hard": 346.12,
+            "Medium": 268.61
+        },
+        "avg_test_cases_by_difficulty": {
+            "Easy": 5.17,
+            "Hard": 5.41,
+            "Medium": 5.35
+        }
+    }
+}

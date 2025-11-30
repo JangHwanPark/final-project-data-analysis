@@ -1,0 +1,33 @@
+{
+    "summary_info": {
+        "generated_at": "2025-11-30T09:21:12.114091"
+    },
+    "metrics": {
+        "total_questions": 616,
+        "days_span": 2,
+        "latest_created_at": "2025-03-18T12:43:45.737301+00:00",
+        "earliest_created_at": "2025-03-16T09:50:40.463489+00:00",
+        "difficulty_distribution": {
+            "counts": {
+                "Hard": 240,
+                "Medium": 193,
+                "Easy": 183
+            },
+            "percentages": {
+                "Hard": 38.96,
+                "Medium": 31.33,
+                "Easy": 29.71
+            }
+        },
+        "problems_per_day": [
+            {
+                "date": "2025-03-16",
+                "count": 474
+            },
+            {
+                "date": "2025-03-18",
+                "count": 142
+            }
+        ]
+    }
+}

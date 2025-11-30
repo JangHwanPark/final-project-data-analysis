@@ -3,7 +3,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from app.pipeline_options import PipelineOptions
+from app.pipeline_options import PipelineOptions, default_frontend_targets
+from app_types.pipelien import AnalysisScope
 from constants.cli import (
   CLI_DESCRIPTION,
   CLI_EPILOG,
@@ -52,11 +53,12 @@ def parse_arguments() -> tuple[PipelineOptions, bool]:
   options = PipelineOptions(
     data_file=args.data_file,
     engine=args.engine,
-    analysis_scope="full",
+    analysis_scope=AnalysisScope.FULL,
     output_targets={"json", "excel", "charts"},
     json_dir=ArtifactsPaths.JSON,
     charts_dir=ArtifactsPaths.CHARTS,
     xlsx_dir=ArtifactsPaths.XLSX,
+    frontend_json_targets=default_frontend_targets(analysis_scope=AnalysisScope.FULL),
   )
 
   interactive = not args.no_interactive

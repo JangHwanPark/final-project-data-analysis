@@ -14,14 +14,21 @@ except (ImportError, AssertionError):
     pass
 
 from typing import Any, Dict, Set, List, Tuple
+from constants.path import DataPaths
+from infrastructure.logging import get_logger
+
 from constants.path import (
   ArtifactsPaths,
   FrontendPaths,
 )
+
 from app_types.pipelien import AnalysisScope, OutputTarget
-from app.pipeline_options import PipelineOptions
-from constants.path import DataPaths
-from infrastructure.logging import get_logger
+from app.pipeline_options import (
+  PipelineOptions,
+  FrontendJsonTarget,
+  default_frontend_targets
+)
+
 from constants.interactive import (
   OUTPUT_TARGET_CHOICES,
   OUTPUT_TARGET_MAP,
@@ -214,8 +221,7 @@ def print_summary(
         json_dir: Path,
         charts_dir: Path,
         xlsx_dir: Path,
-        # frontend_json_targets: List[Tuple[Path, str]]
-        frontend_json_targets: list
+        frontend_json_targets: List[FrontendJsonTarget],
 ) -> None:
   questionary.print(
     "\n[선택한 옵션 요약]",
@@ -229,9 +235,9 @@ def print_summary(
   questionary.print(f" - charts_dir: {charts_dir}")
   questionary.print(f" - xlsx_dir: {xlsx_dir}")
   questionary.print(f" - frontend_json_targets (Total: {len(frontend_json_targets)}):")
-  for path, filename, scope in frontend_json_targets:
+  for target in frontend_json_targets:
     # 경로와 파일명 같이 표시
-    questionary.print(f"   -> [{scope.value}] {path} / {filename}")
+    questionary.print(f"   -> [{target.scope.value}] {target.target_dir} / {target.filename}")
   questionary.print("")
 
 
@@ -268,29 +274,11 @@ def ask_user_with_questionary() -> PipelineOptions:
   analysis_scope = ask_analysis_scope()
   output_targets = ask_output_targets()
 
-  # output_targets를 기준으로 기존 플래그 값도 계산
-  # generate_charts = ask_generate_charts()
-  # generate_excel = ask_generate_excel()
-
   # 저장 경로 확인
   json_dir = ArtifactsPaths.JSON
   charts_dir = ArtifactsPaths.CHARTS
   xlsx_dir = ArtifactsPaths.XLSX
-  frontend_base = FrontendPaths.PUBLIC_DATA_DIR.parent.parent
-  # frontend_json_dirs = [
-  #     FrontendPaths.PUBLIC_DATA_DIR,               # 1. public/data
-  #     frontend_base / "src" / "shared" / "data"    # 2. src/shared/data
-  # ]
-  frontend_targets = [
-    (FrontendPaths.PUBLIC_DATA_DIR, "dashboard_data.json", AnalysisScope.BASIC),
-    (frontend_base / "src" / "shared" / "data", "raw_stats.json", AnalysisScope.FULL)
-  ]
-  # frontend_json_dir = FrontendPaths.PUBLIC_DATA_DIR
-  # artifact_paths = ask_artifact_paths(
-  #   output_targets=output_targets,
-  #   generate_charts=generate_charts,
-  #   generate_excel=generate_excel,
-  # )
+  frontend_targets = default_frontend_targets(analysis_scope=analysis_scope)
 
   # 최종 요약 출력
   print_summary(
@@ -338,12 +326,6 @@ def ask_user_with_fallback() -> PipelineOptions:
   engine = "csv"
   analysis_scope = ask_analysis_scope()
   output_targets = ask_output_targets()
-
-  # 차트/엑셀은 기본 True
-  # logger.info("차트 생성: True")
-  # logger.info("Excel 생성: True")
-  # generate_charts = True
-  # generate_excel = True
 
   return PipelineOptions(
     data_file=data_file,
