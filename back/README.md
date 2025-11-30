@@ -1,22 +1,24 @@
 [EN](README.md) |  [KO](docs/README.ko.md)
 
 # Backend – Python Data Analysis Pipeline
-This backend loads CSV data, performs preprocessing, computes statistical metrics, and emits JSON artifacts for the frontend dashboard. The codebase is organized as a proper Python package (`backend`) to simplify imports and execution.
+This backend loads the Kaggle Coding Questions dataset, performs preprocessing, computes statistical metrics, and emits JSON/Excel/chart artifacts for the frontend dashboard. The codebase is organized as a Python package (`backend`) inside `back/src`.
 
-The layered architecture remains the same (app → domain → infrastructure → presentation) but is now grouped under a single package root.
+The layered architecture remains the same (app → domain → infrastructure → presentation) but is grouped under a single package root.
 
 ## Backend Structure Overview
 ```text
-backend/
+back/
 ├─ data/                     # Input CSV file(s)
-├─ artifacts/                # Generated JSON files and optional charts
-│   └─ summaries/
-│       └─ summary.json
-└─ src/                   # Package root
-   ├─ app/                # CLI entry point
-   ├─ domain/             # Analysis logic & entities
-   ├─ infrastructure/     # File I/O, logging, configuration
-   └─ presentation/       # (Optional) visualization / reporting
+├─ artifacts/                # Generated JSON files, charts, Excel exports
+│   ├─ charts/
+│   ├─ json/
+│   ├─ summaries/
+│   └─ xlsx/
+└─ src/                      # Package root (import as `backend`)
+   ├─ app/                   # CLI entry point, pipeline orchestration
+   ├─ domain/                # Analysis logic & entities
+   ├─ infrastructure/        # File I/O, logging, configuration
+   └─ presentation/          # Exporters for JSON/Excel/Charts
 ```
 
 ## Dependencies
@@ -74,16 +76,21 @@ Use the full path inside the virtual environment
 ## How to Run
 Run the pipeline from the `back` directory with the `src` folder on your `PYTHONPATH`.
 ```bash
+# Move into backend directory
 cd back
-export PYTHONPATH="$(pwd)/src"  # PowerShell: $env:PYTHONPATH="$(Get-Location)/src"
-python -m backend.app.main --data-file data/coding-questions-dataset/questions_dataset.csv
+# Activate virtual environment (Windows PowerShell)
+.\.venv\Scripts\activate
+python -m src.app.main --data-file data/coding-questions-dataset/questions_dataset.csv
 ```
 The `--data-file` flag is optional; by default the loader reads the CSV defined in `backend.infrastructure.config.DATA_FILE`.
 
 ## Artifacts
-All analysis results are stored in the following directory.
+All analysis results are stored in the following directories. The pipeline also mirrors tabbed JSON files to `front/src/shared/data` for the Next.js app.
+
 ```text
 artifacts/
+  ├─ summaries/   # Statistical summaries, CSV/Excel exports
   ├─ charts/      # Visualization images (plots, graphs)
-  └─ summaries/   # Statistical summaries, CSV/Excel exports
+  ├─ json/        # Tabbed JSON (overview/difficulty/tags/structure/raw)
+  └─ xlsx/        # Excel splits per tab
 ```

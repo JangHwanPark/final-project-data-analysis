@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend (Next.js Dashboard)
+This Next.js (App Router) dashboard renders the analysis artifacts produced by the Python backend. The UI is organized with a feature-sliced structure (`app/`, `entities/`, `features/`, `widgets/`, `shared/`, `view/`).
+
+## Data Source
+Generated JSON files live in `src/shared/data/` (e.g., `summary-full.json`, `overview.json`, `difficulty.json`, `tags.json`, `structure.json`).
+They are produced by the backend pipeline (`python -m backend.app.main` inside `back`) and copied into this folder so the app can import them statically.
+
+## Key Routes
+- `/` — Main analytics dashboard backed by real summary data.
+- `/dashboard` — Management overview using mock activity/stat cards.(Test)
 
 ## Getting Started
-
-First, run the development server:
-
 ```bash
+cd front
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
+- `npm run dev` — Start the development server.
+- `npm run build` — Build the production bundle.
+- `npm run start` — Run the production server.
+- `npm run lint` — Lint with ESLint.
+- `npm run format` — Format with Prettier.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+- Next.js 16 (App Router), React 19
+- Tailwind CSS 4
+- Recharts, TanStack Table, Mantine components
+- Zustand for client-side state
+- date-fns, framer-motion, lucide-react for UX polish
