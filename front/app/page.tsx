@@ -1,8 +1,11 @@
+import { Suspense } from 'react';
+
 import type { Metadata } from 'next';
+
+import { summary } from '@/entities/summary';
+import type { RawStatsSummary } from '@/entities/summary/types';
 import rawSummary from '@/shared/data/summary.json';
 import { MainPage } from '@/view/main';
-import type {RawStatsSummary} from "@/entities/summary/types";
-import { summary } from '@/entities/summary';
 
 export const metadata: Metadata = {
   title: '대시보드 | 프로젝트 통계',
@@ -11,5 +14,11 @@ export const metadata: Metadata = {
 
 export default function HomeRoute() {
   const stats = summary.mapper.toStats(rawSummary as RawStatsSummary);
-  return <MainPage stats={stats}/>
-};
+  return (
+    <Suspense
+      fallback={<div className="p-8 text-center text-zinc-500">대시보드를 불러오는 중...</div>}
+    >
+      <MainPage stats={stats} />
+    </Suspense>
+  );
+}
