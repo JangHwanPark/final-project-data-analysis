@@ -9,7 +9,12 @@ import { useRawDataActions } from '@/features/dashboard';
 // =================================================================
 // 상단 타이틀 + 버튼 영역 (ActionToolbar)
 // =================================================================
-const ActionToolbar = ({ data }: { data: any }) => {
+interface ActionToolbarProps {
+  data: any;
+  title: string;
+}
+
+const ActionToolbar = ({ data, title }: ActionToolbarProps) => {
   const { copied, handleCopy, handleDownload } = useRawDataActions(data);
 
   return (
@@ -19,7 +24,7 @@ const ActionToolbar = ({ data }: { data: any }) => {
           <FileJson className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-white">Raw Data Explorer</h3>
+          <h3 className="text-lg font-bold text-white">{title} Explorer</h3>
           <p className="text-xs text-zinc-500">
             전체 분석 데이터를 확인하고 다운로드할 수 있습니다.
           </p>

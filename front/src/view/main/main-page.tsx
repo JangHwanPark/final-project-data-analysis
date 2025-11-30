@@ -18,6 +18,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { difficulty } from '@/entities/difficulty';
 import { tags } from '@/entities/tags';
 import { structure } from '@/entities/structure';
+import { JsonDataType } from '@/shared/data/types';
 
 type Props = {
   stats: StatsSummary;
@@ -123,7 +124,7 @@ export function MainPage({ stats }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <RawDataContent data={stats} />
+            <RawDataContent/>
           </motion.div>
         )}
       </AnimatePresence>
