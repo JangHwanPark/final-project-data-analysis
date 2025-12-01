@@ -13,10 +13,11 @@ from domain.entities.data_model import QuestionData
 logger = get_logger(__name__)
 
 
+# ====================================================
+# 데이터 로딩을 담당하는 인프라스트럭처 클래스.
+# CSV 파일을 읽어 pandas DataFrame을 QuestionData 도메인 객체로 반환
+# ====================================================
 class DataLoader:
-  # 데이터 로딩을 담당하는 인프라스트럭처 클래스.
-  # CSV 파일을 읽어 pandas DataFrame을 QuestionData 도메인 객체로 반환합니다.
-
   def __init__(self):
     logger.info("DataLoader initialized.")
 

@@ -23,7 +23,7 @@ from domain.service.metrics import compute_statistics
 from infrastructure.data_loader import DataLoader
 from infrastructure.logging import StepLogger, log_banner
 from infrastructure.logging.style import FG
-from infrastructure.path_manager import ArtifactType
+from infrastructure.runtime.env import is_frozen_exe, get_base_dir
 from presentation.exporters import JsonExporter, ExcelExporter, ChartExporter
 from .pipeline_options import PipelineOptions, default_frontend_targets
 from infrastructure.path_manager import get_target_directories, ArtifactType
@@ -82,8 +82,20 @@ class DataAnalysisPipeline:
     ensure_directories()
 
   def _load_data(self, steps: StepLogger, options: PipelineOptions) -> QuestionData:
-    steps.step(PIPELINE_STEP_LOADING_DATA.format(path=options.data_file))
-    return self.data_loader.load_csv_data(options.data_file)
+    # ---------------------------------------------------------
+    # exe vs dev에 따라 CSV 경로 결정
+    # ---------------------------------------------------------
+    # steps.step(PIPELINE_STEP_LOADING_DATA.format(path=options.data_file))
+    # return self.data_loader.load_csv_data(options.data_file)
+    if is_frozen_exe():
+      # pipeline.exe와 같은 폴더
+      data_file = get_base_dir() / "questions_dataset.csv"
+    else:
+      # 기존 CLI 선택 경로
+      data_file = options.data_file
+
+    steps.step(PIPELINE_STEP_LOADING_DATA.format(path=data_file))
+    return self.data_loader.load_csv_data(data_file)
 
   def _compute_summary(self, steps: StepLogger, question_data: QuestionData) -> DatasetSummary:
     steps.step(PIPELINE_STEP_COMPUTE_STATS)
