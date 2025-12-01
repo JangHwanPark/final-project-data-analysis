@@ -159,3 +159,12 @@ Overview 페이지에서는 다음과 같은 주요 통계와 시각화를 확�
 <br/>
 
 ## FrontEnd Performance
+![FrontEnd Performance](./img/front_performance.png)
+대시보드는 Next.js 14(App Router) 기반으로 구축되었으며, 정적 JSON 렌더링을 통해 매우 빠른 초기 로딩 성능을 제공합니다. Chrome DevTools Performance 검사 결과, 아래와 같이 모든 핵심 웹 지표(Core Web Vitals)에서 우수한 
+성능을 기록했습니다.
+
+이는 정적 데이터 로딩, 경량 UI 구성, 코드 스플리팅 및 렌더링 최적화가 적용된 결과입니다.
+
+- **LCP (Largest Contentful Paint): 0.30s** — 매우 빠른 초기 렌더링  
+- **CLS (Cumulative Layout Shift): 0** — 레이아웃 흔들림 없이 안정적인 화면  
+- **INP (Interaction to Next Paint): 56ms** — 사용자 입력에 즉각 반응
